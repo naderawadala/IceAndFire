@@ -1,6 +1,7 @@
+using IceAndFire.Infrastructure.Config;
+using IceAndFire.Infrastructure.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
-
-app.Run();
+builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
+builder.Services.AddSingleton<MongoDbContext>();
