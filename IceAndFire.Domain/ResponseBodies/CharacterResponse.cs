@@ -8,6 +8,7 @@ namespace IceAndFire.Domain.ResponseBodies
 {
     public class CharacterResponse
     {
+        public string id { get; set; }
         public string url { get; set; }
         public string name { get; set; }
         public string gender { get; set; }

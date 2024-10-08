@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace IceAndFire.Domain.Mappers
 {
@@ -15,6 +16,9 @@ namespace IceAndFire.Domain.Mappers
         {
             return new Character
             {
+                ObjectId = ObjectId.GenerateNewId(),
+                Id = item.url.Split('/').LastOrDefault(),
+                Url = item.url ?? "",
                 Name = item.name ?? "",
                 Gender = item.gender ?? "",
                 Culture = item.culture ?? "",

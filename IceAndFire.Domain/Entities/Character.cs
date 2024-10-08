@@ -12,6 +12,12 @@ namespace IceAndFire.Domain.Entities
 {
     public class Character
     {
+        [BsonId]
+        public ObjectId ObjectId { get; set; }
+
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
+
         [JsonPropertyName("url")]
         public string Url { get; set; }  
    

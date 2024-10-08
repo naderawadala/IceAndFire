@@ -11,7 +11,7 @@ namespace IceAndFire.Domain.Entities
     public class Book
     {
         [BsonId]
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Url { get; set; }
         public string Name { get; set; }
         public string Isbn { get; set; }
