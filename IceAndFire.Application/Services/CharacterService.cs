@@ -11,17 +11,21 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using IceAndFire.Domain.Mappers;
 using IceAndFire.Domain.ResponseBodies;
+using Microsoft.Extensions.Configuration;
 
 namespace IceAndFire.Application.Services
 {
     public class CharacterService
     {
+        private readonly String _apiUrl;
         private readonly MongoDbContext _context;
         private readonly RedisCacheService _redisCache;
         private readonly HttpClient _httpClient;
 
-        public CharacterService(MongoDbContext context, RedisCacheService redisCache, HttpClient httpClient)
+        public CharacterService(IConfiguration config, MongoDbContext context, RedisCacheService redisCache, HttpClient httpClient)
         {
+            
+            _apiUrl = config["ApiSettings:CharactersApiUrl"];
             _context = context;
             _redisCache = redisCache;
             _httpClient = httpClient;
@@ -31,7 +35,6 @@ namespace IceAndFire.Application.Services
         {
             const string cacheKey = "characters";
 
-            // Step 1: Check Redis Cache
             var cachedData = _redisCache.Get(cacheKey);
             Console.WriteLine("PRE CACHE");
             if (cachedData != null)
@@ -41,18 +44,15 @@ namespace IceAndFire.Application.Services
             }
             Console.WriteLine("post CACHE");
 
-            // Step 2: Check MongoDB
             var charactersFromDb = await _context.Characters.Find(_ => true).ToListAsync();
             if (charactersFromDb.Count > 0)
             {
                 Console.WriteLine("IN MONGO");
-                // Cache the result from DB
                 _redisCache.Set(cacheKey, JsonSerializer.Serialize(charactersFromDb), TimeSpan.FromMinutes(10));
                 return charactersFromDb;
             }
             Console.WriteLine("OUT MONGO");
 
-            // Step 3: Call External API
             var charactersFromApi = await FetchCharactersFromApiAsync();
             if (charactersFromApi != null && charactersFromApi.Any())
             {
@@ -69,7 +69,7 @@ namespace IceAndFire.Application.Services
 
         private async Task<IEnumerable<Character>> FetchCharactersFromApiAsync()
         {
-            var response = await _httpClient.GetStringAsync("https://anapioficeandfire.com/api/characters");
+            var response = await _httpClient.GetStringAsync(_apiUrl);
 
             var apiResponse = JsonSerializer.Deserialize<List<CharacterResponse>>(response, new JsonSerializerOptions
             {
@@ -79,6 +79,52 @@ namespace IceAndFire.Application.Services
             var characters = apiResponse?.Select(CharacterMapper.Map).ToList();
 
             return characters ?? new List<Character>();
+        }
+
+        public async Task<Character> GetCharacterByIdAsync(string id)
+        {
+            var cachedData = _redisCache.Get(id);
+            if (cachedData != null)
+            {
+                Console.WriteLine("Character found in cache.");
+                return JsonSerializer.Deserialize<Character>(cachedData);
+            }
+
+            var characterFromDb = await _context.Characters.Find(c => c.Id == id).FirstOrDefaultAsync();
+            if (characterFromDb != null)
+            {
+                Console.WriteLine("Character found in MongoDB.");
+                _redisCache.Set(id, JsonSerializer.Serialize(characterFromDb), TimeSpan.FromMinutes(10));
+                return characterFromDb;
+            }
+
+            var characterFromApi = await FetchCharacterFromApiAsync(id);
+            if (characterFromApi != null)
+            {
+                Console.WriteLine("Character fetched from API.");
+                var mappedCharacter = CharacterMapper.Map(characterFromApi);
+
+                await _context.Characters.InsertOneAsync(mappedCharacter);
+
+                _redisCache.Set(id, JsonSerializer.Serialize(mappedCharacter), TimeSpan.FromMinutes(10));
+                return mappedCharacter;
+            }
+
+            return null;
+        }
+
+        private async Task<CharacterResponse> FetchCharacterFromApiAsync(string id)
+        {
+            var response = await _httpClient.GetAsync(_apiUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<CharacterResponse>(jsonResponse, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+            }
+            return null;
         }
     }
 }

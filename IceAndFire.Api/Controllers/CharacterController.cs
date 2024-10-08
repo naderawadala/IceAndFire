@@ -26,5 +26,16 @@ namespace IceAndFire.Api.Controllers
             return Ok(characters);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCharacterById(string id)
+        {
+            var character = await _service.GetCharacterByIdAsync(id);
+            if (character == null)
+            {
+                return NotFound();
+            }
+            return Ok(character);
+        }
+
     }
 }

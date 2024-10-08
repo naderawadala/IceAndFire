@@ -14,16 +14,11 @@ namespace IceAndFire.Application.Queries
         {
             return await context.Characters.Find(_ => true).ToListAsync();
         }
-/*
+
         [GraphQLDescription("Get a character by ID.")]
         public async Task<Character> getCharacterById(string id, [Service] MongoDbContext context)
         {
-            if (ObjectId.TryParse(id, out ObjectId objectId))
-            {
-                return await context.Characters.Find(c => c.Id == objectId).FirstOrDefaultAsync();
-            }
-
-            return null;
-        }*/
+            return await context.Characters.Find(c => c.Id == id).FirstOrDefaultAsync();
+        }
     }
 }

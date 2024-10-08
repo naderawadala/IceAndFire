@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -14,10 +15,12 @@ namespace IceAndFire.Domain.Mappers
     {
         public static Character Map(CharacterResponse item)
         {
+
+            Console.WriteLine($"Processing URL: {item.url}");
+
             return new Character
             {
-                ObjectId = ObjectId.GenerateNewId(),
-                Id = item.url.Split('/').LastOrDefault(),
+                Id = Regex.Match(item.url, @"/(\d+)").Groups[1].Value,
                 Url = item.url ?? "",
                 Name = item.name ?? "",
                 Gender = item.gender ?? "",
