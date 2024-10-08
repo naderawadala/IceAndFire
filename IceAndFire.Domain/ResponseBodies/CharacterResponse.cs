@@ -8,22 +8,22 @@ namespace IceAndFire.Domain.ResponseBodies
 {
     public class CharacterResponse
     {
-        public string id { get; set; }
-        public string url { get; set; }
-        public string name { get; set; }
-        public string gender { get; set; }
-        public string culture { get; set; }
-        public string born { get; set; }
-        public string died { get; set; }
-        public List<string> titles { get; set; }
-        public List<string> aliases { get; set; }
-        public string father { get; set; }
-        public string mother { get; set; }
-        public string spouse { get; set; }
-        public List<string> allegiances { get; set; }
-        public List<string> books { get; set; }
-        public List<string> povBooks { get; set; }
-        public List<string> tvSeries { get; set; }
-        public List<string> playedBy { get; set; }
+        public string Id { get; set; }
+        public string Url { get; set; }
+        public string Name { get; set; }
+        public string Gender { get; set; }
+        public string Culture { get; set; }
+        public string Born { get; set; }
+        public string Died { get; set; }
+        public List<string> Titles { get; set; }
+        public List<string> Aliases { get; set; }
+        public string Father { get; set; }
+        public string Mother { get; set; }
+        public string Spouse { get; set; }
+        public List<string> Allegiances { get; set; }
+        public List<string> Books { get; set; }
+        public List<string> PovBooks { get; set; }
+        public List<string> TvSeries { get; set; }
+        public List<string> PlayedBy { get; set; }
     }
 }

@@ -20,6 +20,11 @@ namespace IceAndFire.Infrastructure.Persistence
             _database = client.GetDatabase(settings.Value.DatabaseName);
         }
 
+        public IMongoCollection<TEntity> Set<TEntity>() where TEntity : class
+        {
+            return _database.GetCollection<TEntity>(typeof(TEntity).Name.ToLower());
+        }
+
         public IMongoCollection<Character> Characters => _database.GetCollection<Character>("characters");
         public IMongoCollection<Book> Books => _database.GetCollection<Book>("books");
         public IMongoCollection<House> Houses => _database.GetCollection<House>("houses");

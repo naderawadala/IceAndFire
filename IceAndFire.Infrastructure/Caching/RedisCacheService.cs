@@ -25,5 +25,10 @@ namespace IceAndFire.Infrastructure.Caching
         {
             return _database.StringGet(key);
         }
+
+        public void Remove(string key)
+        {
+            _database.KeyDelete(key);
+        }
     }
 }

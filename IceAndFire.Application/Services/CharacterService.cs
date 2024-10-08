@@ -18,7 +18,7 @@ namespace IceAndFire.Application.Services
 {
     public class CharacterService
     {
-        private readonly String _apiUrl;
+        private readonly string _apiUrl;
         private readonly MongoDbContext _context;
         private readonly RedisCacheService _redisCache;
         private readonly HttpClient _httpClient;

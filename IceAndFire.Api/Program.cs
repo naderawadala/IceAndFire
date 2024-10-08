@@ -11,14 +11,18 @@ builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("Mo
 builder.Services.AddSingleton<MongoDbContext>();
 
 builder.Services.AddHttpClient<CharacterService>();
-
 builder.Services.AddScoped<CharacterService>();
+
+builder.Services.AddHttpClient<BookService>();
+builder.Services.AddScoped<BookService>();
+
+
 builder.Services.AddScoped<RedisCacheService>();
 
 builder.Services.AddControllers();
 
 builder.Services.AddGraphQLServer()
-    .AddQueryType<CharacterQueries>();
+    .AddQueryType<CharacterQueries>().AddQueryType<BookQueries>();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["RedisSettings:Connection"]));
 builder.Services.AddSingleton<RedisCacheService>();
