@@ -1,6 +1,12 @@
 # Ice and Fire API
 
-The Ice and Fire API provides access to data related to houses, characters, and books from the famous "A Song of Ice and Fire" series by George R.R. Martin. This API allows users to manage and retrieve information about these entities.
+The Ice and Fire API is a middleware solution that leverages GraphQL to retrieve data related to houses, characters, and books from the famous "A Song of Ice and Fire" series by George R.R. Martin. This API allows users to manage and retrieve information about these entities efficiently.
+
+For the underlying data, the API utilizes the Open API found at [https://anapioficeandfire.com/](https://anapioficeandfire.com/).
+
+Additionally, this API is configured to use **Redis** for caching and **MongoDB** as its database, both of which are set up within a Docker container.
+
+
 
 ## Table of Contents
 
