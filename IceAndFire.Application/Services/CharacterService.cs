@@ -12,6 +12,7 @@ using System.Text.Json;
 using IceAndFire.Domain.Mappers;
 using IceAndFire.Domain.ResponseBodies;
 using Microsoft.Extensions.Configuration;
+using IceAndFire.Domain.DTO;
 
 namespace IceAndFire.Application.Services
 {
@@ -31,7 +32,7 @@ namespace IceAndFire.Application.Services
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<Character>> GetCharactersAsync()
+        public async Task<IEnumerable<CharacterDto>> GetCharactersAsync()
         {
             const string cacheKey = "characters";
 
@@ -40,7 +41,7 @@ namespace IceAndFire.Application.Services
             if (cachedData != null)
             {
                 Console.WriteLine("IN CACHE");
-                return JsonSerializer.Deserialize<IEnumerable<Character>>(cachedData);
+                return JsonSerializer.Deserialize<IEnumerable<CharacterDto>>(cachedData);
             }
             Console.WriteLine("post CACHE");
 
@@ -48,8 +49,9 @@ namespace IceAndFire.Application.Services
             if (charactersFromDb.Count > 0)
             {
                 Console.WriteLine("IN MONGO");
-                _redisCache.Set(cacheKey, JsonSerializer.Serialize(charactersFromDb), TimeSpan.FromMinutes(10));
-                return charactersFromDb;
+                var characterDtos = charactersFromDb.Select(CharacterMapper.MapToDto).ToList();
+                _redisCache.Set(cacheKey, JsonSerializer.Serialize(characterDtos), TimeSpan.FromMinutes(10));
+                return characterDtos;
             }
             Console.WriteLine("OUT MONGO");
 
@@ -59,12 +61,13 @@ namespace IceAndFire.Application.Services
                 Console.WriteLine("IN API");
                 await _context.Characters.InsertManyAsync(charactersFromApi);
 
-                _redisCache.Set(cacheKey, JsonSerializer.Serialize(charactersFromApi), TimeSpan.FromMinutes(10));
+                var characterDtos = charactersFromApi.Select(CharacterMapper.MapToDto).ToList();
+                _redisCache.Set(cacheKey, JsonSerializer.Serialize(characterDtos), TimeSpan.FromMinutes(10));
 
-                return charactersFromApi;
+                return characterDtos;
             }
 
-            return new List<Character>(); 
+            return new List<CharacterDto>();
         }
 
         private async Task<IEnumerable<Character>> FetchCharactersFromApiAsync()
@@ -76,38 +79,39 @@ namespace IceAndFire.Application.Services
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
-            var characters = apiResponse?.Select(CharacterMapper.Map).ToList();
+            var characters = apiResponse?.Select(CharacterMapper.MapToEntity).ToList();
 
             return characters ?? new List<Character>();
         }
 
-        public async Task<Character> GetCharacterByIdAsync(string id)
+        public async Task<CharacterDto> GetCharacterByIdAsync(string id)
         {
             var cachedData = _redisCache.Get(id);
             if (cachedData != null)
             {
                 Console.WriteLine("Character found in cache.");
-                return JsonSerializer.Deserialize<Character>(cachedData);
+                return JsonSerializer.Deserialize<CharacterDto>(cachedData);
             }
 
             var characterFromDb = await _context.Characters.Find(c => c.Id == id).FirstOrDefaultAsync();
             if (characterFromDb != null)
             {
                 Console.WriteLine("Character found in MongoDB.");
-                _redisCache.Set(id, JsonSerializer.Serialize(characterFromDb), TimeSpan.FromMinutes(10));
-                return characterFromDb;
+                var characterDto = CharacterMapper.MapToDto(characterFromDb);
+                _redisCache.Set(id, JsonSerializer.Serialize(characterDto), TimeSpan.FromMinutes(10));
+                return characterDto;
             }
 
             var characterFromApi = await FetchCharacterFromApiAsync(id);
             if (characterFromApi != null)
             {
                 Console.WriteLine("Character fetched from API.");
-                var mappedCharacter = CharacterMapper.Map(characterFromApi);
-
+                var mappedCharacter = CharacterMapper.MapToEntity(characterFromApi);
                 await _context.Characters.InsertOneAsync(mappedCharacter);
 
-                _redisCache.Set(id, JsonSerializer.Serialize(mappedCharacter), TimeSpan.FromMinutes(10));
-                return mappedCharacter;
+                var characterDto = CharacterMapper.MapToDto(mappedCharacter);
+                _redisCache.Set(id, JsonSerializer.Serialize(characterDto), TimeSpan.FromMinutes(10));
+                return characterDto;
             }
 
             return null;
@@ -115,7 +119,7 @@ namespace IceAndFire.Application.Services
 
         private async Task<CharacterResponse> FetchCharacterFromApiAsync(string id)
         {
-            var response = await _httpClient.GetAsync(_apiUrl);
+            var response = await _httpClient.GetAsync($"{_apiUrl}/{id}");
             if (response.IsSuccessStatusCode)
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -126,5 +130,6 @@ namespace IceAndFire.Application.Services
             }
             return null;
         }
+
     }
 }
