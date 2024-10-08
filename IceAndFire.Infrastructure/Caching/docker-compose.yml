@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .                     
+      dockerfile: IceAndFire.Api/Dockerfile         
+    ports:
+      - "5000:8080"
+      - "5001:8081"         
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDB__ConnectionString=mongodb://mongo:27017
+      - MongoDB__DatabaseName=IceAndFireDB
+      - Jwt__Key=YourJwtSecretKey    # TODO fake JWT key, to  be replaced with real
+      - Redis__Connection=redis:6379 
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - backend_network
+
+  mongo:
+    image: mongo                     
+    ports:
+      - "27017:27017"                
+    environment:
+      - MONGO_INITDB_DATABASE=IceAndFireDB
+    volumes:
+      - mongo_data:/data/db          
+    networks:
+      - backend_network
+
+  redis:
+    image: redis                   
+    ports:
+      - "6379:6379"                
+    volumes:
+      - redis_data:/data       
+    networks:
+      - backend_network
+
+volumes:
+  mongo_data:
+  redis_data:
+
+networks:
+  backend_network:
+    driver: bridge

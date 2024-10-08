@@ -31,5 +31,5 @@ namespace IceAndFire.Domain.Entities
         public List<string> TvSeries { get; set; } = new List<string>();
         public List<string> PlayedBy { get; set; } = new List<string>();
     }
-}
+
 }
