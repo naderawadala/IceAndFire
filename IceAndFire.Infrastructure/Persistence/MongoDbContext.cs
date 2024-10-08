@@ -1,4 +1,7 @@
-﻿using MongoDB.Driver;
+﻿using IceAndFire.Domain.Entities;
+using IceAndFire.Infrastructure.Config;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +20,6 @@ namespace IceAndFire.Infrastructure.Persistence
             _database = client.GetDatabase(settings.Value.DatabaseName);
         }
 
+        public IMongoCollection<Character> Characters => _database.GetCollection<Character>("Characters");
     }
 }
