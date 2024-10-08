@@ -1,17 +1,13 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IceAndFire.Domain.Entities
+namespace IceAndFire.Domain.ResponseBodies
 {
-    public class House
+    public class HouseResponse
     {
-        [BsonId]
-        public ObjectId ObjectId { get; set; }
         public string Url { get; set; }
         public string Name { get; set; }
         public string Region { get; set; }

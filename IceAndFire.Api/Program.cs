@@ -16,13 +16,16 @@ builder.Services.AddScoped<CharacterService>();
 builder.Services.AddHttpClient<BookService>();
 builder.Services.AddScoped<BookService>();
 
+builder.Services.AddHttpClient<HouseService>();
+builder.Services.AddScoped<HouseService>();
+
 
 builder.Services.AddScoped<RedisCacheService>();
 
 builder.Services.AddControllers();
 
 builder.Services.AddGraphQLServer()
-    .AddQueryType<CharacterQueries>().AddQueryType<BookQueries>();
+    .AddQueryType<CharacterQueries>().AddQueryType<BookQueries>().AddQueryType<HouseQueries>();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["RedisSettings:Connection"]));
 builder.Services.AddSingleton<RedisCacheService>();
