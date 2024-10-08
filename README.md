@@ -23,20 +23,25 @@ All you need to run this project is Visual Studio and Docker
 
 1. Clone the repository
 
-  git clone https://github.com/naderawadala/IceAndFire.git
+  ```
+git clone https://github.com/naderawadala/IceAndFire.git
+  ```
 
 2. Start the docker container
 
-  run docker-compose --build
+```
+docker-compose --build
+```
 
 3. Access API when container is running:
 
-  http://localhost:5000/api/house
+```
+http://localhost:5000/api/house
 
-  http://localhost:5000/api/character
+http://localhost:5000/api/character
 
-  http://localhost:5000/api/book
-
+http://localhost:5000/api/book
+```
 
 ## Api-Endpoints
 
