@@ -14,7 +14,7 @@ namespace IceAndFire.Application.Queries
         {
             return await context.Characters.Find(_ => true).ToListAsync();
         }
-
+/*
         [GraphQLDescription("Get a character by ID.")]
         public async Task<Character> getCharacterById(string id, [Service] MongoDbContext context)
         {
@@ -24,6 +24,6 @@ namespace IceAndFire.Application.Queries
             }
 
             return null;
-        }
+        }*/
     }
 }

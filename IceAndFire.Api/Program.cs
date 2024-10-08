@@ -3,11 +3,17 @@ using IceAndFire.Infrastructure.Persistence;
 using IceAndFire.Application.Queries;
 using IceAndFire.Infrastructure.Caching;
 using StackExchange.Redis;
+using IceAndFire.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
 builder.Services.AddSingleton<MongoDbContext>();
+
+builder.Services.AddHttpClient<CharacterService>();
+
+builder.Services.AddScoped<CharacterService>();
+builder.Services.AddScoped<RedisCacheService>();
 
 builder.Services.AddControllers();
 
