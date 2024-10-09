@@ -175,7 +175,9 @@ http://localhost:5000/api/book
 
 ## Remaining tasks
 
-- Add Integration and Unit Tests
+- Add Integration and Unit Tests for BE and FE
 - Implement frontend
 - Implement JWT Authentication and Authorization
 - Major codebase refactoring in BE
+- Validation and error page handling
+- Consider adding PATCH partial updating to controllers.
