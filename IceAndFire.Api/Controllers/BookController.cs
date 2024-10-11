@@ -22,10 +22,10 @@ namespace IceAndFire.Api.Controllers
             return Ok(books);
         }
 
-        [HttpGet("{isbn}")]
-        public async Task<IActionResult> GetBookById(string isbn)
+        [HttpGet("{name}")]
+        public async Task<IActionResult> GetBookByName(string name)
         {
-            var book = await _service.GetBookByIsbnAsync(isbn);
+            var book = await _service.GetBookByNameAsync(name);
             if (book == null)
             {
                 return NotFound();
@@ -42,7 +42,7 @@ namespace IceAndFire.Api.Controllers
             }
 
             var createdBook = await _service.CreateBookAsync(bookDto);
-            return CreatedAtAction(nameof(GetBookById), new { isbn = createdBook.Isbn }, createdBook);
+            return CreatedAtAction(nameof(GetBookByName), new { isbn = createdBook.Isbn }, createdBook);
         }
 
         [HttpPut("{isbn}")]

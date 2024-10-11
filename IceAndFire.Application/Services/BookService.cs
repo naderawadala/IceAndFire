@@ -58,32 +58,34 @@ namespace IceAndFire.Application.Services
             return booksFromApi;
         }
 
-        public async Task<BookDto> GetBookByIsbnAsync(string isbn)
+        public async Task<BookDto> GetBookByNameAsync(string name)
         {
-            var cachedData = _redisCache.Get(isbn);
+            var cachedData = _redisCache.Get(name);
             if (cachedData != null)
             {
                 Console.WriteLine("Book found in cache.");
                 return JsonSerializer.Deserialize<BookDto>(cachedData);
             }
 
-            var bookFromDb = await _context.Books.Find(b => b.Isbn.Equals(isbn)).FirstOrDefaultAsync();
+            var bookFromDb = await _context.Books.Find(b => b.Name.Equals(name)).FirstOrDefaultAsync();
             if (bookFromDb != null)
             {
                 Console.WriteLine("Book found in MongoDB.");
                 var bookDto = BookMapper.MapToDto(bookFromDb);
-                _redisCache.Set(isbn, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
+                _redisCache.Set(name, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
+                _redisCache.Set("books", JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
                 return bookDto;
             }
 
-            var bookFromApi = await FetchBookFromApiAsync(isbn);
+            var bookFromApi = await FetchBookFromApiAsync(name);
             if (bookFromApi != null)
             {
                 Console.WriteLine("Book fetched from API.");
                 var mappedBook = BookMapper.MapToEntity(bookFromApi);
                 await _context.Books.InsertOneAsync(mappedBook);
                 var bookDto = BookMapper.MapToDto(mappedBook);
-                _redisCache.Set(isbn, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
+                _redisCache.Set(name, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
+                _redisCache.Set("books", JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
 
                 return bookDto;
             }
@@ -95,8 +97,8 @@ namespace IceAndFire.Application.Services
             var bookEntity = BookMapper.MapToEntity(bookDto);
             await _context.Books.InsertOneAsync(bookEntity);
 
+            _redisCache.Set(bookDto.Name, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
             _redisCache.Remove("books");
-            _redisCache.Set(bookEntity.Isbn, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
             return bookDto;
         }
 
@@ -116,7 +118,7 @@ namespace IceAndFire.Application.Services
 
             Console.WriteLine("reached update");
             var bookEntity = BookMapper.MapToEntity(updatedBookDto);
-            bookEntity.Id = existingBook.Id; 
+            bookEntity.Id = existingBook.Id;
 
             var result = await _context.Books.ReplaceOneAsync(b => b.Isbn.Equals(isbn), bookEntity);
 
@@ -124,8 +126,7 @@ namespace IceAndFire.Application.Services
             if (result.IsAcknowledged)
             {
                 _redisCache.Remove("books");
-                _redisCache.Remove(isbn);
-                _redisCache.Set(updatedBookDto.Isbn, JsonSerializer.Serialize(updatedBookDto), TimeSpan.FromMinutes(10));
+                _redisCache.Remove(existingBook.Name);
                 return updatedBookDto;
             }
 
@@ -140,7 +141,6 @@ namespace IceAndFire.Application.Services
             if (result.DeletedCount > 0)
             {
                 _redisCache.Remove("books");
-                _redisCache.Remove(isbn);
                 return true;
             }
 
@@ -157,6 +157,8 @@ namespace IceAndFire.Application.Services
             });
             Console.WriteLine("preconvert IN BOOKS API FETCH");
             var books = apiResponse?.Select(BookMapper.MapToEntity).ToList() ?? new List<Book>();
+            await _context.Books.InsertManyAsync(books);
+
             var bookDtos = books.Select(BookMapper.MapToDto).ToList();
             Console.WriteLine("SUM TING WONG");
             _redisCache.Set("books", JsonSerializer.Serialize(bookDtos), TimeSpan.FromMinutes(10));
@@ -164,9 +166,9 @@ namespace IceAndFire.Application.Services
             return bookDtos;
         }
 
-        private async Task<BookResponse> FetchBookFromApiAsync(string isbn)
+        private async Task<BookResponse> FetchBookFromApiAsync(string name)
         {
-            var response = await _httpClient.GetAsync($"{_apiUrl}/{isbn}");
+            var response = await _httpClient.GetAsync($"{_apiUrl}/?name={name}");
             if (response.IsSuccessStatusCode)
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();

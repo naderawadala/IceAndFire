@@ -26,10 +26,10 @@ namespace IceAndFire.Application.Queries
             return booksDto.Select(b => BookMapper.MapToEntity(b));
         }
 
-        [GraphQLDescription("Get a book by ISBN.")]
-        public async Task<Book> GetBookByIsbn(string isbn, [Service] MongoDbContext context)
+        [GraphQLDescription("Get a book by name.")]
+        public async Task<Book> GetBookByName(string name, [Service] MongoDbContext context)
         {
-            BookDto bookDto = await this._service.GetBookByIsbnAsync(isbn);
+            BookDto bookDto = await this._service.GetBookByNameAsync(name);
             return BookMapper.MapToEntity(bookDto);
         }
     }
