@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IceAndFire.Domain.DTO
 {
-    public class HouseDto
+    public record HouseDto
     {
         public string Url { get; set; }
         public string Name { get; set; }

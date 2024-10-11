@@ -8,6 +8,7 @@ using MongoDB.Bson;
 
 namespace IceAndFire.Application.Queries
 {
+    [ExtendObjectType(typeof(Query))]
     public class CharacterQueries
     {
         public async Task<IEnumerable<Character>> getCharacters([Service] MongoDbContext context)

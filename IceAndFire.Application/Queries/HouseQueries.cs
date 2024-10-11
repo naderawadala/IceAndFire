@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace IceAndFire.Application.Queries
 {
+    [ExtendObjectType(typeof(Query))]
     public class HouseQueries
     {
         // Get all houses

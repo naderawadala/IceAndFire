@@ -12,8 +12,6 @@ namespace IceAndFire.Domain.Entities
 {
     public class Character
     {
-        [BsonId]
-        public ObjectId ObjectId { get; set; }
 
         [JsonPropertyName("id")]
         public required string Id { get; set; }

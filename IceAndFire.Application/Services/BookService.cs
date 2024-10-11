@@ -41,8 +41,11 @@ namespace IceAndFire.Application.Services
                 Console.WriteLine("Books found in cache.");
                 return JsonSerializer.Deserialize<IEnumerable<BookDto>>(cachedData);
             }
+            Console.WriteLine("in here");
 
             var booksFromDb = await _context.Books.Find(_ => true).ToListAsync();
+
+            Console.WriteLine("OUT here");
             if (booksFromDb.Count > 0)
             {
                 Console.WriteLine("Books found in MongoDB.");
@@ -50,7 +53,7 @@ namespace IceAndFire.Application.Services
                 _redisCache.Set(cacheKey, JsonSerializer.Serialize(bookDtos), TimeSpan.FromMinutes(10));
                 return bookDtos;
             }
-
+            Console.WriteLine("before here");
             var booksFromApi = await FetchBooksFromApiAsync();
             return booksFromApi;
         }
@@ -64,7 +67,7 @@ namespace IceAndFire.Application.Services
                 return JsonSerializer.Deserialize<BookDto>(cachedData);
             }
 
-            var bookFromDb = await _context.Books.Find(b => b.Isbn == isbn).FirstOrDefaultAsync();
+            var bookFromDb = await _context.Books.Find(b => b.Isbn.Equals(isbn)).FirstOrDefaultAsync();
             if (bookFromDb != null)
             {
                 Console.WriteLine("Book found in MongoDB.");
@@ -99,17 +102,23 @@ namespace IceAndFire.Application.Services
 
         public async Task<BookDto> UpdateBookAsync(string isbn, BookDto updatedBookDto)
         {
-            var existingBook = await _context.Books.Find(b => b.Isbn == isbn).FirstOrDefaultAsync();
-
+            Console.WriteLine("started update");
+            Console.WriteLine(isbn);
+            var existingBook = await _context.Books.Find(b => b.Isbn.Equals(isbn)).FirstOrDefaultAsync();
+            Console.WriteLine("reached update 4");
+            Console.WriteLine(existingBook.Id);
+            Console.WriteLine(existingBook.Isbn);
+            Console.WriteLine(existingBook == null);
             if (existingBook == null)
             {
                 return null;
             }
 
+            Console.WriteLine("reached update");
             var bookEntity = BookMapper.MapToEntity(updatedBookDto);
-            bookEntity.ObjectId = existingBook.ObjectId; 
+            bookEntity.Id = existingBook.Id; 
 
-            var result = await _context.Books.ReplaceOneAsync(b => b.Isbn == isbn, bookEntity);
+            var result = await _context.Books.ReplaceOneAsync(b => b.Isbn.Equals(isbn), bookEntity);
 
 
             if (result.IsAcknowledged)
@@ -125,8 +134,9 @@ namespace IceAndFire.Application.Services
 
         public async Task<bool> DeleteBookAsync(string isbn)
         {
-            var result = await _context.Books.DeleteOneAsync(b => b.Isbn == isbn);
-
+            Console.WriteLine(isbn);
+            var result = await _context.Books.DeleteOneAsync(b => b.Isbn.Equals(isbn));
+            Console.WriteLine(result.DeletedCount.ToString());
             if (result.DeletedCount > 0)
             {
                 _redisCache.Remove("books");
@@ -139,17 +149,18 @@ namespace IceAndFire.Application.Services
 
         private async Task<IEnumerable<BookDto>> FetchBooksFromApiAsync()
         {
+            Console.WriteLine("in here unc");
             var response = await _httpClient.GetStringAsync(_apiUrl);
             var apiResponse = JsonSerializer.Deserialize<List<BookResponse>>(response, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
-            
+            Console.WriteLine("preconvert IN BOOKS API FETCH");
             var books = apiResponse?.Select(BookMapper.MapToEntity).ToList() ?? new List<Book>();
             var bookDtos = books.Select(BookMapper.MapToDto).ToList();
-
+            Console.WriteLine("SUM TING WONG");
             _redisCache.Set("books", JsonSerializer.Serialize(bookDtos), TimeSpan.FromMinutes(10));
-
+            Console.WriteLine("SUM TING WONG 666");
             return bookDtos;
         }
 

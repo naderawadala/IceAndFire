@@ -106,7 +106,7 @@ namespace IceAndFire.Application.Services
             }
 
             var houseEntity = HouseMapper.MapToEntity(updatedHouseDto);
-            houseEntity.ObjectId = existingHouse.ObjectId;
+           // houseEntity.ObjectId = existingHouse.ObjectId;
 
             var result = await _context.Houses.ReplaceOneAsync(h => h.Name == name, houseEntity);
 

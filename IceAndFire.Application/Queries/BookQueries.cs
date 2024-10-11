@@ -1,4 +1,7 @@
-﻿using IceAndFire.Domain.Entities;
+﻿using IceAndFire.Application.Services;
+using IceAndFire.Domain.DTO;
+using IceAndFire.Domain.Entities;
+using IceAndFire.Domain.Mappers;
 using IceAndFire.Infrastructure.Persistence;
 using MongoDB.Driver;
 using System;
@@ -9,38 +12,25 @@ using System.Threading.Tasks;
 
 namespace IceAndFire.Application.Queries
 {
+    [ExtendObjectType(typeof(Query))]
     public class BookQueries
     {
+        private readonly BookService _service;
+        public BookQueries(BookService service) { 
+         this._service = service;
+        }
+        [GraphQLDescription("Get all books")]
         public async Task<IEnumerable<Book>> GetBooks([Service] MongoDbContext context)
         {
-            return await context.Books.Find(_ => true).ToListAsync(); 
+            IEnumerable<BookDto> booksDto = await this._service.GetBooksAsync();
+            return booksDto.Select(b => BookMapper.MapToEntity(b));
         }
 
         [GraphQLDescription("Get a book by ISBN.")]
         public async Task<Book> GetBookByIsbn(string isbn, [Service] MongoDbContext context)
         {
-            return await context.Books.Find(b => b.Isbn == isbn).FirstOrDefaultAsync(); 
-        }
-
-        [GraphQLDescription("Create a new book.")]
-        public async Task<Book> CreateBook(Book book, [Service] MongoDbContext context)
-        {
-            await context.Books.InsertOneAsync(book); 
-            return book; 
-        }
-
-        [GraphQLDescription("Update an existing book.")]
-        public async Task<Book> UpdateBook(string isbn, Book updatedBook, [Service] MongoDbContext context)
-        {
-            var result = await context.Books.ReplaceOneAsync(b => b.Isbn == isbn, updatedBook);
-            return result.IsAcknowledged ? updatedBook : null; 
-        }
-
-        [GraphQLDescription("Delete a book by ISBN.")]
-        public async Task<bool> DeleteBook(string isbn, [Service] MongoDbContext context)
-        {
-            var result = await context.Books.DeleteOneAsync(b => b.Isbn == isbn);
-            return result.DeletedCount > 0; 
+            BookDto bookDto = await this._service.GetBookByIsbnAsync(isbn);
+            return BookMapper.MapToEntity(bookDto);
         }
     }
 }
