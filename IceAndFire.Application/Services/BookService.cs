@@ -23,6 +23,8 @@ namespace IceAndFire.Application.Services
         private readonly RedisCacheService _redisCache;
         private readonly HttpClient _httpClient;
 
+        private const string cacheKey = "books";
+
         public BookService(IConfiguration config, MongoDbContext context, RedisCacheService redisCache, HttpClient httpClient)
         {
             _apiUrl = config["ApiSettings:BooksApiUrl"];
@@ -33,8 +35,6 @@ namespace IceAndFire.Application.Services
 
         public async Task<IEnumerable<BookDto>> GetBooksAsync()
         {
-            const string cacheKey = "books";
-
             var cachedData = _redisCache.Get(cacheKey);
             if (cachedData != null)
             {
@@ -73,11 +73,11 @@ namespace IceAndFire.Application.Services
                 Console.WriteLine("Book found in MongoDB.");
                 var bookDto = BookMapper.MapToDto(bookFromDb);
                 _redisCache.Set(name, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
-                _redisCache.Set("books", JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
+                _redisCache.Set(cacheKey, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
                 return bookDto;
             }
 
-            var bookFromApi = await FetchBookFromApiAsync(name);
+            BookDto bookFromApi = await FetchBookFromApiAsync(name);
             if (bookFromApi != null)
             {
                 Console.WriteLine("Book fetched from API.");
@@ -85,7 +85,7 @@ namespace IceAndFire.Application.Services
                 await _context.Books.InsertOneAsync(mappedBook);
                 var bookDto = BookMapper.MapToDto(mappedBook);
                 _redisCache.Set(name, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
-                _redisCache.Set("books", JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
+                _redisCache.Remove(cacheKey);
 
                 return bookDto;
             }
@@ -98,7 +98,7 @@ namespace IceAndFire.Application.Services
             await _context.Books.InsertOneAsync(bookEntity);
 
             _redisCache.Set(bookDto.Name, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
-            _redisCache.Remove("books");
+            _redisCache.Remove(cacheKey);
             return bookDto;
         }
 
@@ -125,7 +125,7 @@ namespace IceAndFire.Application.Services
 
             if (result.IsAcknowledged)
             {
-                _redisCache.Remove("books");
+                _redisCache.Remove(cacheKey);
                 _redisCache.Remove(existingBook.Name);
                 return updatedBookDto;
             }
@@ -140,7 +140,7 @@ namespace IceAndFire.Application.Services
             Console.WriteLine(result.DeletedCount.ToString());
             if (result.DeletedCount > 0)
             {
-                _redisCache.Remove("books");
+                _redisCache.Remove(cacheKey);
                 return true;
             }
 
@@ -151,28 +151,27 @@ namespace IceAndFire.Application.Services
         {
             Console.WriteLine("in here unc");
             var response = await _httpClient.GetStringAsync(_apiUrl);
-            var apiResponse = JsonSerializer.Deserialize<List<BookResponse>>(response, new JsonSerializerOptions
+            var bookDtos = JsonSerializer.Deserialize<List<BookDto>>(response, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
             Console.WriteLine("preconvert IN BOOKS API FETCH");
-            var books = apiResponse?.Select(BookMapper.MapToEntity).ToList() ?? new List<Book>();
+            var books = bookDtos?.Select(BookMapper.MapToEntity).ToList() ?? new List<Book>();
             await _context.Books.InsertManyAsync(books);
 
-            var bookDtos = books.Select(BookMapper.MapToDto).ToList();
             Console.WriteLine("SUM TING WONG");
-            _redisCache.Set("books", JsonSerializer.Serialize(bookDtos), TimeSpan.FromMinutes(10));
+            _redisCache.Set(cacheKey, JsonSerializer.Serialize(bookDtos), TimeSpan.FromMinutes(10));
             Console.WriteLine("SUM TING WONG 666");
             return bookDtos;
         }
 
-        private async Task<BookResponse> FetchBookFromApiAsync(string name)
+        private async Task<BookDto> FetchBookFromApiAsync(string name)
         {
             var response = await _httpClient.GetAsync($"{_apiUrl}/?name={name}");
             if (response.IsSuccessStatusCode)
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<BookResponse>(jsonResponse, new JsonSerializerOptions
+                return JsonSerializer.Deserialize<BookDto>(jsonResponse, new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });

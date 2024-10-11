@@ -1,4 +1,6 @@
 ﻿using IceAndFire.Application.Services;
+using IceAndFire.Domain.DTO;
+using IceAndFire.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +18,25 @@ namespace IceAndFire.Application.Mutations
             this._service = service;
         }
 
-        public string Test()
+        [GraphQLDescription("Create a new House.")]
+        public async Task<HouseDto> CreateHouse(HouseDto houseDto, [Service] MongoDbContext context)
         {
-            return "test";
+            HouseDto createdHouseDto = await this._service.CreateHouseAsync(houseDto);
+            return createdHouseDto;
+        }
+
+        [GraphQLDescription("Update an existing house.")]
+        public async Task<HouseDto> UpdateHouse(string name, HouseDto houseDto, [Service] MongoDbContext context)
+        {
+            HouseDto updatedHouseDto = await this._service.UpdateHouseAsync(name, houseDto);
+            return updatedHouseDto;
+        }
+
+        [GraphQLDescription("Delete a house by name.")]
+        public async Task<bool> DeleteHouse(string name, [Service] MongoDbContext context)
+        {
+            bool isDeleted = await this._service.DeleteHouseAsync(name);
+            return isDeleted;
         }
     }
 }

@@ -63,7 +63,7 @@ namespace IceAndFire.Application.Services
                 return JsonSerializer.Deserialize<HouseDto>(cachedData);
             }
 
-            var houseFromDb = await _context.Houses.Find(h => h.Name == name).FirstOrDefaultAsync();
+            var houseFromDb = await _context.Houses.Find(h => h.Name.Equals(name)).FirstOrDefaultAsync();
             if (houseFromDb != null)
             {
                 Console.WriteLine("House found in MongoDB.");
@@ -98,7 +98,7 @@ namespace IceAndFire.Application.Services
 
         public async Task<HouseDto> UpdateHouseAsync(string name, HouseDto updatedHouseDto)
         {
-            var existingHouse = await _context.Houses.Find(h => h.Name == name).FirstOrDefaultAsync();
+            var existingHouse = await _context.Houses.Find(h => h.Name.Equals(name)).FirstOrDefaultAsync();
 
             if (existingHouse == null)
             {
@@ -106,9 +106,9 @@ namespace IceAndFire.Application.Services
             }
 
             var houseEntity = HouseMapper.MapToEntity(updatedHouseDto);
-           // houseEntity.ObjectId = existingHouse.ObjectId;
+            houseEntity.Id = existingHouse.Id;
 
-            var result = await _context.Houses.ReplaceOneAsync(h => h.Name == name, houseEntity);
+            var result = await _context.Houses.ReplaceOneAsync(h => h.Name.Equals(name), houseEntity);
 
             if (result.IsAcknowledged)
             {
@@ -123,7 +123,7 @@ namespace IceAndFire.Application.Services
 
         public async Task<bool> DeleteHouseAsync(string name)
         {
-            var result = await _context.Houses.DeleteOneAsync(h => h.Name == name);
+            var result = await _context.Houses.DeleteOneAsync(h => h.Name.Equals(name));
 
             if (result.DeletedCount > 0)
             {

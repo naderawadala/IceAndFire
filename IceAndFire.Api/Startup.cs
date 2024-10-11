@@ -45,8 +45,6 @@ namespace IceAndFire.Api
                 .AddTypeExtension<CharacterMutations>()
                 .AddTypeExtension<BookMutations>()
                 .AddTypeExtension<HouseMutations>();
-                //.AddType<ObjectIdType>()
-
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
