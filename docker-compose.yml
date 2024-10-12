@@ -12,13 +12,24 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDB__ConnectionString=mongodb://mongo:27017
       - MongoDB__DatabaseName=IceAndFireDB
-      - Jwt__Key=YourJwtSecretKey    # TODO fake JWT key, to  be replaced with real
+      - Jwt__Key=YourJwtSecretKey    # TODO fake JWT key, to be replaced with real
       - Redis__Connection=redis:6379 
     depends_on:
       - mongo
       - redis
     networks:
       - backend_network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    networks:
+      - frontend_network
+    depends_on:
+      - api
 
   mongo:
     image: mongo                     
@@ -46,4 +57,6 @@ volumes:
 
 networks:
   backend_network:
+    driver: bridge
+  frontend_network:
     driver: bridge
