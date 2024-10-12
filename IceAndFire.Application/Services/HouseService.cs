@@ -1,7 +1,6 @@
 ﻿using IceAndFire.Domain.DTO;
 using IceAndFire.Domain.Entities;
 using IceAndFire.Domain.Mappers;
-using IceAndFire.Domain.ResponseBodies;
 using IceAndFire.Infrastructure.Caching;
 using IceAndFire.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
@@ -78,10 +77,9 @@ namespace IceAndFire.Application.Services
                 Console.WriteLine("House fetched from API.");
                 var mappedHouse = HouseMapper.MapToEntity(houseFromApi);
                 await _context.Houses.InsertOneAsync(mappedHouse);
-                var houseDto = HouseMapper.MapToDto(mappedHouse);
-                _redisCache.Set(name, JsonSerializer.Serialize(houseDto), TimeSpan.FromMinutes(10));
+                _redisCache.Set(name, JsonSerializer.Serialize(houseFromApi), TimeSpan.FromMinutes(10));
 
-                return houseDto;
+                return houseFromApi;
             }
             return null;
         }
@@ -138,25 +136,24 @@ namespace IceAndFire.Application.Services
         private async Task<IEnumerable<HouseDto>> FetchHousesFromApiAsync()
         {
             var response = await _httpClient.GetStringAsync(_apiUrl);
-            var apiResponse = JsonSerializer.Deserialize<List<HouseResponse>>(response, new JsonSerializerOptions
+            var houseDtos = JsonSerializer.Deserialize<List<HouseDto>>(response, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
 
-            var houses = apiResponse?.Select(HouseMapper.MapToEntity).ToList() ?? new List<House>();
-            var houseDtos = houses.Select(HouseMapper.MapToDto).ToList();
+            var houses = houseDtos?.Select(HouseMapper.MapToEntity).ToList() ?? new List<House>();
 
             _redisCache.Set("houses", JsonSerializer.Serialize(houseDtos), TimeSpan.FromMinutes(10));
 
             return houseDtos;
         }
 
-        private async Task<HouseResponse> FetchHouseFromApiAsync(string name)
+        private async Task<HouseDto> FetchHouseFromApiAsync(string name)
         {
             var response = await _httpClient.GetAsync($"{_apiUrl}/?name={name}");
             var jsonResponse = await response.Content.ReadAsStringAsync();
-            var houseArray = JsonSerializer.Deserialize<List<HouseResponse>>(jsonResponse, new JsonSerializerOptions
+            var houseArray = JsonSerializer.Deserialize<List<HouseDto>>(jsonResponse, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });

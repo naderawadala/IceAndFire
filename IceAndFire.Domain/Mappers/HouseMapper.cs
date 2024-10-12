@@ -1,6 +1,5 @@
 ﻿using IceAndFire.Domain.DTO;
 using IceAndFire.Domain.Entities;
-using IceAndFire.Domain.ResponseBodies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,29 +10,6 @@ namespace IceAndFire.Domain.Mappers
 {
     public static class HouseMapper
     {
-        public static House MapToEntity(HouseResponse item)
-        {
-            return new House
-            {
-                Url = item.Url ?? "",
-                Name = item.Name ?? "",
-                Region = item.Region ?? "",
-                CoatOfArms = item.CoatOfArms ?? "",
-                Words = item.Words ?? "",
-                Titles = item.Titles ?? new List<string>(),
-                Seats = item.Seats ?? new List<string>(),
-                CurrentLord = item.CurrentLord ?? "",
-                Heir = item.Heir ?? "",
-                Overlord = item.Overlord ?? "",
-                Founded = item.Founded ?? "",
-                Founder = item.Founder ?? "",
-                DiedOut = item.DiedOut ?? "",
-                AncestralWeapons = item.AncestralWeapons ?? new List<string>(),
-                CadetBranches = item.CadetBranches ?? new List<string>(),
-                SwornMembers = item.SwornMembers ?? new List<string>()
-            };
-        }
-
         public static HouseDto MapToDto(House house)
         {
             if (house == null) return null;

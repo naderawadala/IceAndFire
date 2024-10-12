@@ -1,7 +1,6 @@
 ﻿using IceAndFire.Domain.DTO;
 using IceAndFire.Domain.Entities;
 using IceAndFire.Domain.Mappers;
-using IceAndFire.Domain.ResponseBodies;
 using IceAndFire.Infrastructure.Caching;
 using IceAndFire.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
