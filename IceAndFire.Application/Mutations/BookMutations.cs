@@ -33,14 +33,14 @@ namespace IceAndFire.Application.Mutations
             return createdBookDto;
         }
 
-        [Authorize]
+      //  [Authorize]
         [GraphQLDescription("Update an existing book.")]
         public async Task<BookDto> UpdateBook(string isbn, [UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto, [Service] MongoDbContext context)
         {
             BookDto updatedBookDto = await this._service.UpdateBookAsync(isbn, bookDto);
             return updatedBookDto;
         }
-        [Authorize(Policy = "isAdmin")]
+       // [Authorize(Policy = "isAdmin")]
 
         [GraphQLDescription("Delete a book by ISBN.")]
         public async Task<bool> DeleteBook(string isbn, [Service] MongoDbContext context)

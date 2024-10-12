@@ -56,4 +56,3 @@ The frontend accesses graphql for data retrieval at http://localhost:5000/graphq
 - Implement JWT Authentication and Authorization
 - Major codebase refactoring in BE
 - Validation and error page handling
-- Consider adding PATCH partial updating.

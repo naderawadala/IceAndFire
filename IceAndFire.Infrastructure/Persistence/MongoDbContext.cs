@@ -28,5 +28,7 @@ namespace IceAndFire.Infrastructure.Persistence
         public IMongoCollection<Character> Characters => _database.GetCollection<Character>("characters");
         public IMongoCollection<Book> Books => _database.GetCollection<Book>("books");
         public IMongoCollection<House> Houses => _database.GetCollection<House>("houses");
+
+        public IMongoCollection<User> Users => _database.GetCollection<User>("users");
     }
 }
