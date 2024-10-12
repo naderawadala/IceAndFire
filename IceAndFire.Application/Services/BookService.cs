@@ -134,12 +134,12 @@ namespace IceAndFire.Application.Services
 
         public async Task<bool> DeleteBookAsync(string isbn)
         {
-            Console.WriteLine(isbn);
-            var result = await _context.Books.DeleteOneAsync(b => b.Isbn.Equals(isbn));
+            string name = _context.Books.Find(b => b.Isbn.Equals(isbn)).FirstOrDefaultAsync().Result.Name;
+            var result = await _context.Books.DeleteOneAsync(isbn);
             Console.WriteLine(result.DeletedCount.ToString());
             if (result.DeletedCount > 0)
             {
-                _redisCache.Remove(cacheKey);
+                _redisCache.Remove(name);
                 return true;
             }
 

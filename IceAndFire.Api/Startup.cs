@@ -1,4 +1,4 @@
-﻿using IceAndFire.Application.Mutations;
+using IceAndFire.Application.Mutations;
 using IceAndFire.Application.Queries;
 using IceAndFire.Application.Services;
 using IceAndFire.Domain;
@@ -44,7 +44,9 @@ namespace IceAndFire.Api
                 .AddTypeExtension<HouseQueries>()
                 .AddTypeExtension<CharacterMutations>()
                 .AddTypeExtension<BookMutations>()
-                .AddTypeExtension<HouseMutations>();
+                .AddTypeExtension<HouseMutations>()
+                .AddAuthorization()
+                .AddFluentValidation();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -55,6 +57,10 @@ namespace IceAndFire.Api
             }
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {

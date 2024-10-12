@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using IceAndFire.Application.Services;
 using IceAndFire.Domain.DTO;
+using HotChocolate.Authorization;
+using IceAndFire.Domain.Validators;
+using FluentValidation.Results;
+using AppAny.HotChocolate.FluentValidation;
 
 namespace IceAndFire.Application.Mutations
 {
@@ -22,18 +26,21 @@ namespace IceAndFire.Application.Mutations
         }
 
         [GraphQLDescription("Create a new book.")]
-        public async Task<BookDto> CreateBook(BookDto bookDto, [Service] MongoDbContext context)
+        public async Task<BookDto> CreateBook([UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto, [Service] MongoDbContext context)
         {
+          
             BookDto createdBookDto = await this._service.CreateBookAsync(bookDto);
             return createdBookDto;
         }
 
+        [Authorize]
         [GraphQLDescription("Update an existing book.")]
-        public async Task<BookDto> UpdateBook(string isbn, BookDto bookDto, [Service] MongoDbContext context)
+        public async Task<BookDto> UpdateBook(string isbn, [UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto, [Service] MongoDbContext context)
         {
             BookDto updatedBookDto = await this._service.UpdateBookAsync(isbn, bookDto);
             return updatedBookDto;
         }
+        [Authorize(Policy = "isAdmin")]
 
         [GraphQLDescription("Delete a book by ISBN.")]
         public async Task<bool> DeleteBook(string isbn, [Service] MongoDbContext context)

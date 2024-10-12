@@ -1,5 +1,7 @@
-﻿using IceAndFire.Application.Services;
+﻿using AppAny.HotChocolate.FluentValidation;
+using IceAndFire.Application.Services;
 using IceAndFire.Domain.DTO;
+using IceAndFire.Domain.Validators;
 using IceAndFire.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
@@ -19,14 +21,14 @@ namespace IceAndFire.Application.Mutations
         }
 
         [GraphQLDescription("Create a new House.")]
-        public async Task<HouseDto> CreateHouse(HouseDto houseDto, [Service] MongoDbContext context)
+        public async Task<HouseDto> CreateHouse([UseFluentValidation, UseValidator<HouseInputValidator>] HouseDto houseDto, [Service] MongoDbContext context)
         {
             HouseDto createdHouseDto = await this._service.CreateHouseAsync(houseDto);
             return createdHouseDto;
         }
 
         [GraphQLDescription("Update an existing house.")]
-        public async Task<HouseDto> UpdateHouse(string name, HouseDto houseDto, [Service] MongoDbContext context)
+        public async Task<HouseDto> UpdateHouse(string name, [UseFluentValidation, UseValidator<HouseInputValidator>] HouseDto houseDto, [Service] MongoDbContext context)
         {
             HouseDto updatedHouseDto = await this._service.UpdateHouseAsync(name, houseDto);
             return updatedHouseDto;
