@@ -90,9 +90,17 @@ export const createBook = createAsyncThunk('books/createBook', async (bookData) 
                 released: "${bookData.released}",
                 characters: ${JSON.stringify(bookData.characters)},
                 povCharacters: ${JSON.stringify(bookData.povCharacters)}
-                
             }) {
                 name
+                isbn
+                authors
+                numberOfPages
+                publisher
+                country
+                mediaType
+                released
+                characters
+                povCharacters
             }
         }
     `;
@@ -116,10 +124,10 @@ export const createBook = createAsyncThunk('books/createBook', async (bookData) 
 
 // Update an existing book
 export const updateBook = createAsyncThunk('books/updateBook', async ({ isbn, bookData }) => {
+    console.log("Inside updateBook thunk", isbn, bookData);
     const query = `
         mutation {
-             updateBook(isbn: "${isbn}", bookDto: {
-                url: "${bookData.url}",
+             updateBook(isbn:"${isbn}", bookDto: {
                 name: "${bookData.name}",
                 isbn: "${bookData.isbn}",
                 authors: ${JSON.stringify(bookData.authors)},
@@ -127,11 +135,20 @@ export const updateBook = createAsyncThunk('books/updateBook', async ({ isbn, bo
                 publisher: "${bookData.publisher}",
                 country: "${bookData.country}",
                 mediaType: "${bookData.mediaType}",
-                released: "${new Date(bookData.released).toISOString()}",
+                released: "${bookData.released}",
                 characters: ${JSON.stringify(bookData.characters)},
                 povCharacters: ${JSON.stringify(bookData.povCharacters)}
             }) {
                 name
+                isbn
+                authors
+                numberOfPages
+                publisher
+                country
+                mediaType
+                released
+                characters
+                povCharacters
             }
         }
     `;
@@ -145,6 +162,7 @@ export const updateBook = createAsyncThunk('books/updateBook', async ({ isbn, bo
     });
 
     const data = await response.json();
+    console.log('Update Response:', data);
 
     if (data.errors) {
         throw new Error(data.errors.map(err => err.message).join(', '));

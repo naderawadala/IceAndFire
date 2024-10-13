@@ -24,6 +24,9 @@ FROM nginx:alpine
 # Copy the built React app into the nginx directory
 COPY --from=build /app/build /usr/share/nginx/html
 
+# Copy the custom nginx configuration file
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expose port 80 to serve the app
 EXPOSE 80
 

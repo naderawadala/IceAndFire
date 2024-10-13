@@ -7,7 +7,7 @@ import { fetchBooks } from '../redux/booksSlice';
 const BookList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const books = useSelector((state) => state.books.items);
+    const books = useSelector((state) => state.books.items) || []; // Fallback to empty array
     const bookStatus = useSelector((state) => state.books.status);
     const error = useSelector((state) => state.books.error);
 
@@ -43,8 +43,8 @@ const BookList = () => {
                             <Card.Body>
                                 <Card.Title>{book.name}</Card.Title>
                                 <Card.Subtitle className="mb-2 text-muted">
-                                    {book.authors.length > 1 ? "Authors: " : "Author: "}
-                                    {book.authors.join(", ")}
+                                    {Array.isArray(book.authors) && book.authors.length > 1 ? "Authors: " : "Author: "}
+                                    {Array.isArray(book.authors) ? book.authors.join(", ") : "Unknown Author"}
                                 </Card.Subtitle>
                                 <Card.Text className="mt-3">
                                     <strong>ISBN:</strong> {book.isbn} <br />

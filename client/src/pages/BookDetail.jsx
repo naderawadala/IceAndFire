@@ -24,7 +24,7 @@ const BookDetail = () => {
         // Dispatch the deleteBook action
         try {
             await dispatch(deleteBook(book.isbn)).unwrap(); // Using unwrap to handle potential errors
-            navigate('/'); // Navigate back to the book list after deletion
+            navigate('/books'); // Navigate back to the book list after deletion
         } catch (error) {
             console.error('Delete error:', error.message); // Handle error if needed
         }

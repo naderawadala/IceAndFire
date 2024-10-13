@@ -1,0 +1,29 @@
+.nav-link {
+    font-size: 1.25rem; /* Font size for navigation links */
+    transition: background-color 0.5s ease, color 0.5s ease; /* Smooth transition with longer delay */
+    padding: 10px 15px; /* Add padding for better click area */
+    margin-right: 20px; /* Add space between nav links */
+}
+
+/* Change background and text color on hover */
+.nav-link:hover {
+    background-color: #e0e0e0; /* Light grey background on hover */
+    color: #FF4500; /* Change text color on hover */
+}
+
+.nav-button-container {
+    margin-left: 15px; /* Space between last nav link and logout button */
+}
+
+.logout-button {
+    font-size: 1.25rem; /* Font size for logout button */
+    color: #007bff; /* Bootstrap primary color */
+    padding: 10px 15px; /* Padding for the button */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition for background color and scale */
+}
+
+/* Change background and text color on hover for logout button */
+.logout-button:hover {
+    background-color: rgba(0, 123, 255, 0.1); /* Light background on hover */
+    transform: scale(1.05); /* Slightly increase size on hover */
+}

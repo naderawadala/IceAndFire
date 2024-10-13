@@ -18,8 +18,9 @@ namespace IceAndFire.Domain.Validators
 
             RuleFor(b => b.Isbn)
                 .NotEmpty().WithMessage("ISBN is required.")
-                .Matches(@"\b\d{3}-\d{1,5}-\d{1,7}-\d{1,7}-\d{1}\b")
-                .WithMessage("Invalid ISBN format. Example: 978-3-16-148410-0");
+                .Matches(@"^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$")
+                .WithMessage("Invalid ISBN format. ISBN must be 10 or 13 digits, and may contain hyphens. Example: 978-3-16-148410-0 or 0-19-852663-6.");
+
 
             RuleFor(b => b.Authors)
                 .NotEmpty().WithMessage("At least one author is required.")
