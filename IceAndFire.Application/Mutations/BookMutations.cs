@@ -26,18 +26,18 @@ namespace IceAndFire.Application.Mutations
         }
 
         [GraphQLDescription("Create a new book.")]
-        public async Task<BookDto> CreateBook([UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto, [Service] MongoDbContext context)
+        public async Task<Book> CreateBook([UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto, [Service] MongoDbContext context)
         {
           
-            BookDto createdBookDto = await this._service.CreateBookAsync(bookDto);
+            Book createdBookDto = await this._service.CreateBookAsync(bookDto);
             return createdBookDto;
         }
 
       //  [Authorize]
         [GraphQLDescription("Update an existing book.")]
-        public async Task<BookDto> UpdateBook(string isbn, [UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto, [Service] MongoDbContext context)
+        public async Task<Book> UpdateBook(string isbn, [UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto, [Service] MongoDbContext context)
         {
-            BookDto updatedBookDto = await this._service.UpdateBookAsync(isbn, bookDto);
+            Book updatedBookDto = await this._service.UpdateBookAsync(isbn, bookDto);
             return updatedBookDto;
         }
        // [Authorize(Policy = "isAdmin")]

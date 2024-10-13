@@ -22,15 +22,18 @@ namespace IceAndFire.Application.Queries
         [GraphQLDescription("Get all books")]
         public async Task<IEnumerable<Book>> GetBooks([Service] MongoDbContext context)
         {
-            IEnumerable<BookDto> booksDto = await this._service.GetBooksAsync();
-            return booksDto.Select(b => BookMapper.MapToEntity(b));
+            //IEnumerable<BookDto> booksDto = await this._service.GetBooksAsync();
+            IEnumerable<Book> books = await this._service.GetBooksAsync();
+            return books;
         }
 
         [GraphQLDescription("Get a book by name.")]
         public async Task<Book> GetBookByName(string name, [Service] MongoDbContext context)
         {
-            BookDto bookDto = await this._service.GetBookByNameAsync(name);
-            return BookMapper.MapToEntity(bookDto);
+            // BookDto bookDto = await this._service.GetBookByNameAsync(name);
+            //return BookMapper.MapToEntity(bookDto);
+            Book book = await this._service.GetBookByNameAsync(name);
+            return book;
         }
     }
 }
