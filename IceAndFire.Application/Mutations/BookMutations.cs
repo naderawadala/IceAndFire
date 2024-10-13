@@ -28,7 +28,6 @@ namespace IceAndFire.Application.Mutations
         [GraphQLDescription("Create a new book.")]
         public async Task<Book> CreateBook([UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto, [Service] MongoDbContext context)
         {
-          
             Book createdBookDto = await this._service.CreateBookAsync(bookDto);
             return createdBookDto;
         }
@@ -45,6 +44,7 @@ namespace IceAndFire.Application.Mutations
         [GraphQLDescription("Delete a book by ISBN.")]
         public async Task<bool> DeleteBook(string isbn, [Service] MongoDbContext context)
         {
+            Console.WriteLine("does this even enter");
             bool isDeleted = await this._service.DeleteBookAsync(isbn);
             return isDeleted;
         }

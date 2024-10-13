@@ -29,6 +29,13 @@ const BookList = () => {
     return (
         <section className="mt-5">
             <h2>BOOKS</h2>
+            <Button 
+                variant="success" 
+                className="mb-3" 
+                onClick={() => navigate('/books/new')}
+            >
+                Create Book
+            </Button>
             <Row>
                 {books.map((book) => (
                     <Col xs={12} md={4} key={book.isbn}>

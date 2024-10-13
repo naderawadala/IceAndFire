@@ -7,6 +7,7 @@ import HouseList from './components/HouseList';
 import BookDetail from './pages/BookDetail';
 import CharacterDetail from './pages/CharacterDetail';
 import HouseDetail from './pages/HouseDetail';
+import BookForm from './components/BookForm';
 import Navbar from './components/Navbar';
 
 const App = () => {
@@ -19,13 +20,16 @@ const App = () => {
                 <Route path="/" element={<Main />} />
                 <Route path="/books" element={<BookList />} />
                 <Route path="/books/:name" element={<BookDetail />} />
+                <Route path="/update-book/:name" element={<BookForm />} /> 
+                <Route path="/books/new" element={<BookForm />} />
+
                 <Route path="/characters" element={<CharacterList />} />
                 <Route path="/characters/:id" element={<CharacterDetail />} />
+
                 <Route path="/houses" element={<HouseList />} />
                 <Route path="/houses/:id" element={<HouseDetail />} />
-                {/* Add other routes here */}
-                <Route path="/about" element={() => <h1>About Page</h1>} />
-                <Route path="/contact" element={() => <h1>Contact Page</h1>} />
+
+
             </Routes>
         </Router>
     );

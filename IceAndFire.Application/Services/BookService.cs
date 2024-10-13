@@ -130,20 +130,32 @@ namespace IceAndFire.Application.Services
 
             return null;
         }
-        
+
         public async Task<bool> DeleteBookAsync(string isbn)
         {
-            string name = _context.Books.Find(b => b.Isbn.Equals(isbn)).FirstOrDefaultAsync().Result.Name;
-            var result = await _context.Books.DeleteOneAsync(isbn);
-            Console.WriteLine(result.DeletedCount.ToString());
+            var book = await _context.Books.Find(b => b.Isbn.Equals(isbn)).FirstOrDefaultAsync();
+
+            if (book == null)
+            {
+                Console.WriteLine($"No book found with ISBN: {isbn}");
+                return false;
+            }
+
+            Console.WriteLine($"Deleting book: {book.Name}");
+
+            var result = await _context.Books.DeleteOneAsync(b => b.Isbn.Equals(isbn));
+
+            Console.WriteLine($"Deleted count: {result.DeletedCount}");
+
             if (result.DeletedCount > 0)
             {
-                _redisCache.Remove(name);
+                _redisCache.Remove(book.Name);
                 return true;
             }
 
             return false;
         }
+
 
         private async Task<IEnumerable<Book>> FetchBooksFromApiAsync()
         {
