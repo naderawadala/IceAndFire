@@ -29,7 +29,7 @@ namespace IceAndFire.Application.Services
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<HouseDto>> GetHousesAsync()
+        public async Task<IEnumerable<House>> GetHousesAsync()
         {
             const string cacheKey = "houses";
 
@@ -37,46 +37,45 @@ namespace IceAndFire.Application.Services
             if (cachedData != null)
             {
                 Console.WriteLine("Houses found in cache.");
-                return JsonSerializer.Deserialize<IEnumerable<HouseDto>>(cachedData);
+               // return JsonSerializer.Deserialize<IEnumerable<House>>(cachedData);
             }
 
             var housesFromDb = await _context.Houses.Find(_ => true).ToListAsync();
             if (housesFromDb.Count > 0)
             {
                 Console.WriteLine("Houses found in MongoDB.");
-                var houseDtos = housesFromDb.Select(HouseMapper.MapToDto).ToList();
-                _redisCache.Set(cacheKey, JsonSerializer.Serialize(houseDtos), TimeSpan.FromMinutes(10));
-                return houseDtos;
+                _redisCache.Set(cacheKey, JsonSerializer.Serialize(housesFromDb), TimeSpan.FromMinutes(10));
+                return housesFromDb;
             }
 
             var housesFromApi = await FetchHousesFromApiAsync();
             return housesFromApi;
         }
 
-        public async Task<HouseDto> GetHouseByNameAsync(string name)
+        public async Task<House> GetHouseByNameAsync(string name)
         {
             var cachedData = _redisCache.Get(name);
             if (cachedData != null)
             {
                 Console.WriteLine("House found in cache.");
-                return JsonSerializer.Deserialize<HouseDto>(cachedData);
+                // return JsonSerializer.Deserialize<House>(cachedData);
             }
 
             var houseFromDb = await _context.Houses.Find(h => h.Name.Equals(name)).FirstOrDefaultAsync();
             if (houseFromDb != null)
             {
                 Console.WriteLine("House found in MongoDB.");
-                var houseDto = HouseMapper.MapToDto(houseFromDb);
-                _redisCache.Set(name, JsonSerializer.Serialize(houseDto), TimeSpan.FromMinutes(10));
-                return houseDto;
+                //var houseDto = HouseMapper.MapToDto(houseFromDb);
+                _redisCache.Set(name, JsonSerializer.Serialize(houseFromDb), TimeSpan.FromMinutes(10));
+                return houseFromDb;
             }
 
             var houseFromApi = await FetchHouseFromApiAsync(name);
             if (houseFromApi != null)
             {
                 Console.WriteLine("House fetched from API.");
-                var mappedHouse = HouseMapper.MapToEntity(houseFromApi);
-                await _context.Houses.InsertOneAsync(mappedHouse);
+                //var mappedHouse = HouseMapper.MapToEntity(houseFromApi);
+                await _context.Houses.InsertOneAsync(houseFromApi);
                 _redisCache.Set(name, JsonSerializer.Serialize(houseFromApi), TimeSpan.FromMinutes(10));
 
                 return houseFromApi;
@@ -84,17 +83,17 @@ namespace IceAndFire.Application.Services
             return null;
         }
 
-        public async Task<HouseDto> CreateHouseAsync(HouseDto houseDto)
+        public async Task<House> CreateHouseAsync(HouseDto houseDto)
         {
             var houseEntity = HouseMapper.MapToEntity(houseDto);
             await _context.Houses.InsertOneAsync(houseEntity);
 
             _redisCache.Remove("houses");
-            _redisCache.Set(houseEntity.Name, JsonSerializer.Serialize(houseDto), TimeSpan.FromMinutes(10));
-            return houseDto;
+            _redisCache.Set(houseEntity.Name, JsonSerializer.Serialize(houseEntity), TimeSpan.FromMinutes(10));
+            return houseEntity;
         }
 
-        public async Task<HouseDto> UpdateHouseAsync(string name, HouseDto updatedHouseDto)
+        public async Task<House> UpdateHouseAsync(string name, HouseDto updatedHouseDto)
         {
             var existingHouse = await _context.Houses.Find(h => h.Name.Equals(name)).FirstOrDefaultAsync();
 
@@ -103,8 +102,7 @@ namespace IceAndFire.Application.Services
                 return null;
             }
 
-            var houseEntity = HouseMapper.MapToEntity(updatedHouseDto);
-            houseEntity.Id = existingHouse.Id;
+            var houseEntity = HouseMapper.MapToEntity(updatedHouseDto, existingHouse.Id);
 
             var result = await _context.Houses.ReplaceOneAsync(h => h.Name.Equals(name), houseEntity);
 
@@ -112,8 +110,8 @@ namespace IceAndFire.Application.Services
             {
                 _redisCache.Remove("houses");
                 _redisCache.Remove(name);
-                _redisCache.Set(updatedHouseDto.Name, JsonSerializer.Serialize(updatedHouseDto), TimeSpan.FromMinutes(10));
-                return updatedHouseDto;
+                _redisCache.Set(updatedHouseDto.Name, JsonSerializer.Serialize(houseEntity), TimeSpan.FromMinutes(10));
+                return houseEntity;
             }
 
             return null;
@@ -133,27 +131,25 @@ namespace IceAndFire.Application.Services
             return false;
         }
 
-        private async Task<IEnumerable<HouseDto>> FetchHousesFromApiAsync()
+        private async Task<IEnumerable<House>> FetchHousesFromApiAsync()
         {
             var response = await _httpClient.GetStringAsync(_apiUrl);
-            var houseDtos = JsonSerializer.Deserialize<List<HouseDto>>(response, new JsonSerializerOptions
+            var houseDtos = JsonSerializer.Deserialize<List<House>>(response, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
-
-
-            var houses = houseDtos?.Select(HouseMapper.MapToEntity).ToList() ?? new List<House>();
+            await _context.Houses.InsertManyAsync(houseDtos);
 
             _redisCache.Set("houses", JsonSerializer.Serialize(houseDtos), TimeSpan.FromMinutes(10));
 
             return houseDtos;
         }
 
-        private async Task<HouseDto> FetchHouseFromApiAsync(string name)
+        private async Task<House> FetchHouseFromApiAsync(string name)
         {
             var response = await _httpClient.GetAsync($"{_apiUrl}/?name={name}");
             var jsonResponse = await response.Content.ReadAsStringAsync();
-            var houseArray = JsonSerializer.Deserialize<List<HouseDto>>(jsonResponse, new JsonSerializerOptions
+            var houseArray = JsonSerializer.Deserialize<List<House>>(jsonResponse, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });

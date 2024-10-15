@@ -1,5 +1,6 @@
 ﻿using IceAndFire.Domain.DTO;
 using IceAndFire.Domain.Entities;
+using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,12 +36,13 @@ namespace IceAndFire.Domain.Mappers
             };
         }
 
-        public static House MapToEntity(HouseDto dto)
+        public static House MapToEntity(HouseDto dto, string Id = null)
         {
             if (dto == null) return null;
 
             return new House
             {
+                Id = string.IsNullOrEmpty(Id) ? ObjectId.GenerateNewId().ToString() : Id,
                 Url = dto.Url,
                 Name = dto.Name,
                 Region = dto.Region,

@@ -8,10 +8,11 @@ import BookDetail from './pages/BookDetail';
 import CharacterDetail from './pages/CharacterDetail';
 import HouseDetail from './pages/HouseDetail';
 import BookForm from './components/BookForm';
-import Navbar from './components/Navbar';
+import Navbar from './components/MyNavbar'; // Ensure MyNavbar is imported correctly
+import HouseForm from './components/HouseForm';
 
 const App = () => {
-    const username = "User"; // Placeholder for username
+    const username = "User"; // Replace with dynamic user state management
 
     return (
         <Router>
@@ -27,9 +28,9 @@ const App = () => {
                 <Route path="/characters/:id" element={<CharacterDetail />} />
 
                 <Route path="/houses" element={<HouseList />} />
-                <Route path="/houses/:id" element={<HouseDetail />} />
-
-
+                <Route path="/houses/:name" element={<HouseDetail />} />
+                <Route path="/update-house/:name" element={<HouseForm />} />
+                
             </Routes>
         </Router>
     );

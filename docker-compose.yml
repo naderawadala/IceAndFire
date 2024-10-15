@@ -12,7 +12,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDB__ConnectionString=mongodb://mongo:27017
       - MongoDB__DatabaseName=IceAndFireDB
-      - Jwt__Key=YourJwtSecretKey    # TODO fake JWT key, to be replaced with real
+      - Jwt__Key=1791fc7ae4a9df145fb75ce30008845a05ba9282f8ea136e85d17d5d3f5858ff #  // BAD PRACTICE!!!! NEVER DO THIS, USE AN .env FILE THAT IS NOT PART OF THE REPO!! ONLY FOR TESTING
       - Redis__Connection=redis:6379 
     depends_on:
       - mongo

@@ -124,7 +124,7 @@ namespace IceAndFire.Application.Services
             if (result.IsAcknowledged)
             {
                 _redisCache.Remove(cacheKey);
-                _redisCache.Remove(bookEntity.Name);
+                _redisCache.Remove(existingBook.Name);
                 return bookEntity;
             }
 

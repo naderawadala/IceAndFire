@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace IceAndFire.Api
@@ -39,9 +40,9 @@ namespace IceAndFire.Api
             services.AddHttpClient<CharacterService>();
             services.AddHttpClient<BookService>();
             services.AddHttpClient<HouseService>();
-            services.AddHttpClient<UserService>();
+            //services.AddHttpClient<UserService>();
 
-            services.AddScoped<IPasswordHasher, PasswordHasher>(); // Implement your own password hasher
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(_configuration["RedisSettings:Connection"]));
@@ -74,7 +75,7 @@ namespace IceAndFire.Api
                          ValidateIssuerSigningKey = true,
                          ValidIssuer = _configuration["Jwt:Issuer"],
                          ValidAudience = _configuration["Jwt:Audience"],
-                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]))
+                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]))
                      };
                  });
 
@@ -114,6 +115,17 @@ namespace IceAndFire.Api
             {
                 endpoints.MapGraphQL();
             });
+        }
+
+        private byte[] GenerateRandomKey(int sizeInBits)
+        {
+            int sizeInBytes = sizeInBits / 8;
+            byte[] key = new byte[sizeInBytes];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(key);
+            }
+            return key;
         }
     }
 }
