@@ -59,7 +59,7 @@ namespace IceAndFire.Application.Services
             }
 
             user.RefreshToken = GenerateRefreshToken();
-            user.RefreshTokenExpiration = DateTime.Now.AddMinutes(5);
+            user.RefreshTokenExpiration = DateTime.Now.AddMinutes(7);
             await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user);
 
             Console.WriteLine("reached end 1");
@@ -73,7 +73,7 @@ namespace IceAndFire.Application.Services
             Console.WriteLine("back to gen token");
             var claims = new[]
             {
-            new Claim("sub", user.Username),
+            new Claim("subject", user.Username),
             new Claim("jti", user.Id.ToString())
         };
 
@@ -109,14 +109,14 @@ namespace IceAndFire.Application.Services
         {
             var principal = GetPrincipalFromExpiredToken(token);
 
-              Console.WriteLine("Claims in the ClaimsPrincipal:");
-    foreach (var claim in principal.Claims)
-    {
-        Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
-    }
+            Console.WriteLine("Claims in the ClaimsPrincipal:");
+            foreach (var claim in principal.Claims)
+            {
+                Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+            }
 
             // Retrieve the 'sub' claim
-            var usernameClaim = principal.FindFirst("sub");
+            var usernameClaim = principal.FindFirst("subject");
             if (usernameClaim == null)
             {
                 Console.WriteLine("sub claim not found.");
@@ -128,17 +128,27 @@ namespace IceAndFire.Application.Services
 
             var user = await _context.Users.Find(u => u.Username == username).FirstOrDefaultAsync();
 
-            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiration <= DateTime.Now)
+            if (user == null)
             {
-                Console.WriteLine("entering refresh token validation failure block.");
+                Console.WriteLine("User not found.");
+                throw new SecurityTokenException("User not found.");
+            }
+
+            if (user.RefreshToken != refreshToken)
+            {
+                Console.WriteLine("Refresh token does not match.");
                 throw new SecurityTokenException("Invalid refresh token.");
             }
 
-            Console.WriteLine("refresh token validated successfully.");
+            if (user.RefreshTokenExpiration <= DateTime.Now)
+            {
+                Console.WriteLine("Refresh token has expired.");
+                throw new SecurityTokenException("Refresh token has expired. Please log in again.");
+            }
+
+            Console.WriteLine("Refresh token validated successfully.");
             return GenerateToken(user);
         }
-
-
 
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
@@ -185,8 +195,5 @@ namespace IceAndFire.Application.Services
             }
             return bytes;
         }
-
-
-
     }
 }
