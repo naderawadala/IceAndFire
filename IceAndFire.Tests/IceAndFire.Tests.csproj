@@ -6,4 +6,19 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="6.12.1" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.29.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IceAndFire.Application\IceAndFire.Application.csproj" />
+    <ProjectReference Include="..\IceAndFire.Domain\IceAndFire.Domain.csproj" />
+    <ProjectReference Include="..\IceAndFire.Infrastructure\IceAndFire.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

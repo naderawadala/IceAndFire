@@ -1,7 +1,6 @@
 ﻿using IceAndFire.Domain.DTO;
 using IceAndFire.Domain.Entities;
 using IceAndFire.Domain.Mappers;
-using IceAndFire.Domain.ResponseBodies;
 using IceAndFire.Infrastructure.Caching;
 using IceAndFire.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +22,8 @@ namespace IceAndFire.Application.Services
         private readonly RedisCacheService _redisCache;
         private readonly HttpClient _httpClient;
 
+        private const string cacheKey = "books";
+
         public BookService(IConfiguration config, MongoDbContext context, RedisCacheService redisCache, HttpClient httpClient)
         {
             _apiUrl = config["ApiSettings:BooksApiUrl"];
@@ -31,93 +32,112 @@ namespace IceAndFire.Application.Services
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<BookDto>> GetBooksAsync()
+        public async Task<IEnumerable<Book>> GetBooksAsync()
         {
-            const string cacheKey = "books";
-
             var cachedData = _redisCache.Get(cacheKey);
             if (cachedData != null)
             {
                 Console.WriteLine("Books found in cache.");
-                return JsonSerializer.Deserialize<IEnumerable<BookDto>>(cachedData);
+                // TODO: SOMETHING WRONG WITH CACHING, FIX
+                // return JsonSerializer.Deserialize<IEnumerable<Book>>(cachedData);
             }
+            Console.WriteLine("in here");
 
             var booksFromDb = await _context.Books.Find(_ => true).ToListAsync();
+
+            Console.WriteLine("OUT here");
             if (booksFromDb.Count > 0)
             {
                 Console.WriteLine("Books found in MongoDB.");
-                var bookDtos = booksFromDb.Select(BookMapper.MapToDto).ToList();
-                _redisCache.Set(cacheKey, JsonSerializer.Serialize(bookDtos), TimeSpan.FromMinutes(10));
-                return bookDtos;
+                _redisCache.Set(cacheKey, JsonSerializer.Serialize(booksFromDb), TimeSpan.FromMinutes(10));
+                return booksFromDb;
             }
-
+            Console.WriteLine("before here");
             var booksFromApi = await FetchBooksFromApiAsync();
             return booksFromApi;
         }
-
-        public async Task<BookDto> GetBookByIsbnAsync(string isbn)
+        
+        public async Task<Book> GetBookByNameAsync(string name)
         {
-            var cachedData = _redisCache.Get(isbn);
+            var cachedData = _redisCache.Get(name);
             if (cachedData != null)
             {
                 Console.WriteLine("Book found in cache.");
-                return JsonSerializer.Deserialize<BookDto>(cachedData);
+                return JsonSerializer.Deserialize<Book>(cachedData);
             }
 
-            var bookFromDb = await _context.Books.Find(b => b.Isbn == isbn).FirstOrDefaultAsync();
+            var bookFromDb = await _context.Books.Find(b => b.Name.Equals(name)).FirstOrDefaultAsync();
             if (bookFromDb != null)
             {
                 Console.WriteLine("Book found in MongoDB.");
                 var bookDto = BookMapper.MapToDto(bookFromDb);
-                _redisCache.Set(isbn, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
-                return bookDto;
+                _redisCache.Set(name, JsonSerializer.Serialize(bookFromDb), TimeSpan.FromMinutes(10));
+                _redisCache.Set(cacheKey, JsonSerializer.Serialize(bookFromDb), TimeSpan.FromMinutes(10));
+                return bookFromDb;
             }
 
-            var bookFromApi = await FetchBookFromApiAsync(isbn);
+            Book bookFromApi = await FetchBookFromApiAsync(name);
             if (bookFromApi != null)
             {
                 Console.WriteLine("Book fetched from API.");
-                var mappedBook = BookMapper.MapToEntity(bookFromApi);
-                await _context.Books.InsertOneAsync(mappedBook);
-                var bookDto = BookMapper.MapToDto(mappedBook);
-                _redisCache.Set(isbn, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
+                //var mappedBook = BookMapper.MapToEntity(bookFromApi);
+                await _context.Books.InsertOneAsync(bookFromApi);
+                //var bookDto = BookMapper.MapToDto(mappedBook);
+                _redisCache.Set(name, JsonSerializer.Serialize(bookFromApi), TimeSpan.FromMinutes(10));
+                _redisCache.Remove(cacheKey);
 
-                return bookDto;
+                return bookFromApi;
             }
             return null;
         }
 
-        public async Task<BookDto> CreateBookAsync(BookDto bookDto)
+        public async Task<Book> CreateBookAsync(BookDto bookDto)
         {
+            var existingBook = await _context.Books.Find(b => b.Isbn.Equals(bookDto.Isbn)).AnyAsync();
+            if (existingBook)
+            {
+                throw new InvalidOperationException("A book with this ISBN already exists.");
+            }
+
             var bookEntity = BookMapper.MapToEntity(bookDto);
             await _context.Books.InsertOneAsync(bookEntity);
 
-            _redisCache.Remove("books");
-            _redisCache.Set(bookEntity.Isbn, JsonSerializer.Serialize(bookDto), TimeSpan.FromMinutes(10));
-            return bookDto;
+            _redisCache.Set(bookEntity.Name, JsonSerializer.Serialize(bookEntity), TimeSpan.FromMinutes(10));
+            _redisCache.Remove(cacheKey);
+            return bookEntity;
         }
 
-        public async Task<BookDto> UpdateBookAsync(string isbn, BookDto updatedBookDto)
+        public async Task<Book> UpdateBookAsync(string isbn, BookDto updatedBookDto)
         {
-            var existingBook = await _context.Books.Find(b => b.Isbn == isbn).FirstOrDefaultAsync();
-
+            var existingBook = await _context.Books.Find(b => b.Isbn.Equals(isbn)).FirstOrDefaultAsync();
+            
             if (existingBook == null)
             {
                 return null;
             }
 
-            var bookEntity = BookMapper.MapToEntity(updatedBookDto);
-            bookEntity.ObjectId = existingBook.ObjectId; 
+            if (!existingBook.Isbn.Equals(updatedBookDto.Isbn))
+            {
+                var isbnAlreadyTaken = await _context.Books
+                    .Find(b => b.Isbn.Equals(updatedBookDto.Isbn))
+                    .FirstOrDefaultAsync();
 
-            var result = await _context.Books.ReplaceOneAsync(b => b.Isbn == isbn, bookEntity);
+                if (isbnAlreadyTaken != null)
+                {
+                    throw new InvalidOperationException("The book ISBN is already taken by another book.");
+                }
+            }
+
+            var bookEntity = BookMapper.MapToEntity(updatedBookDto, existingBook.Id);
+
+            var result = await _context.Books.ReplaceOneAsync(b => b.Isbn.Equals(isbn), bookEntity);
 
 
             if (result.IsAcknowledged)
             {
-                _redisCache.Remove("books");
-                _redisCache.Remove(isbn);
-                _redisCache.Set(updatedBookDto.Isbn, JsonSerializer.Serialize(updatedBookDto), TimeSpan.FromMinutes(10));
-                return updatedBookDto;
+                _redisCache.Remove(cacheKey);
+                _redisCache.Remove(existingBook.Name);
+                return bookEntity;
             }
 
             return null;
@@ -125,41 +145,56 @@ namespace IceAndFire.Application.Services
 
         public async Task<bool> DeleteBookAsync(string isbn)
         {
-            var result = await _context.Books.DeleteOneAsync(b => b.Isbn == isbn);
+            var book = await _context.Books.Find(b => b.Isbn.Equals(isbn)).FirstOrDefaultAsync();
+
+            if (book == null)
+            {
+                Console.WriteLine($"No book found with ISBN: {isbn}");
+                return false;
+            }
+
+            Console.WriteLine($"Deleting book: {book.Name}");
+
+            var result = await _context.Books.DeleteOneAsync(b => b.Isbn.Equals(isbn));
+
+            Console.WriteLine($"Deleted count: {result.DeletedCount}");
 
             if (result.DeletedCount > 0)
             {
-                _redisCache.Remove("books");
-                _redisCache.Remove(isbn);
+                _redisCache.Remove(book.Name);
                 return true;
             }
 
             return false;
         }
 
-        private async Task<IEnumerable<BookDto>> FetchBooksFromApiAsync()
+
+        private async Task<IEnumerable<Book>> FetchBooksFromApiAsync()
         {
+            Console.WriteLine("in here unc");
             var response = await _httpClient.GetStringAsync(_apiUrl);
-            var apiResponse = JsonSerializer.Deserialize<List<BookResponse>>(response, new JsonSerializerOptions
+            var bookDtos = JsonSerializer.Deserialize<List<Book>>(response, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
-            
-            var books = apiResponse?.Select(BookMapper.MapToEntity).ToList() ?? new List<Book>();
-            var bookDtos = books.Select(BookMapper.MapToDto).ToList();
+            Console.WriteLine("preconvert IN BOOKS API FETCH");
+            //var books = bookDtos?.Select(BookMapper.MapToEntity).ToList() ?? new List<Book>();
+            //var books = bookDtos?.ToList() ?? new List<Book>();
+            await _context.Books.InsertManyAsync(bookDtos);
 
-            _redisCache.Set("books", JsonSerializer.Serialize(bookDtos), TimeSpan.FromMinutes(10));
-
+            Console.WriteLine("SUM TING WONG");
+            _redisCache.Set(cacheKey, JsonSerializer.Serialize(bookDtos), TimeSpan.FromMinutes(10));
+            Console.WriteLine("SUM TING WONG 666");
             return bookDtos;
         }
 
-        private async Task<BookResponse> FetchBookFromApiAsync(string isbn)
+        private async Task<Book> FetchBookFromApiAsync(string name)
         {
-            var response = await _httpClient.GetAsync($"{_apiUrl}/{isbn}");
+            var response = await _httpClient.GetAsync($"{_apiUrl}/?name={name}");
             if (response.IsSuccessStatusCode)
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<BookResponse>(jsonResponse, new JsonSerializerOptions
+                return JsonSerializer.Deserialize<Book>(jsonResponse, new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });

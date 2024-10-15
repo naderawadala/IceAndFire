@@ -4,46 +4,18 @@ using IceAndFire.Application.Queries;
 using IceAndFire.Infrastructure.Caching;
 using StackExchange.Redis;
 using IceAndFire.Application.Services;
-
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
-builder.Services.AddSingleton<MongoDbContext>();
-
-builder.Services.AddHttpClient<CharacterService>();
-builder.Services.AddScoped<CharacterService>();
-
-builder.Services.AddHttpClient<BookService>();
-builder.Services.AddScoped<BookService>();
-
-builder.Services.AddHttpClient<HouseService>();
-builder.Services.AddScoped<HouseService>();
-
-
-builder.Services.AddScoped<RedisCacheService>();
-
-builder.Services.AddControllers();
-
-builder.Services.AddGraphQLServer()
-    .AddQueryType<CharacterQueries>().AddQueryType<BookQueries>().AddQueryType<HouseQueries>();
-
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["RedisSettings:Connection"]));
-builder.Services.AddSingleton<RedisCacheService>();
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
+using IceAndFire.Api;
+public class Program
 {
-    app.UseDeveloperExceptionPage(); 
+    public static void Main(string[] args)
+    {
+        CreateHostBuilder(args).Build().Run();
+    }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
 }
-
-app.UseRouting(); 
-
-app.MapControllers();
-
-app.MapGraphQL();
-
-app.MapGet("/", () => "API is running.");
-
-
-app.Run();

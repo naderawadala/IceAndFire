@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using IceAndFire.Domain.Mappers;
-using IceAndFire.Domain.ResponseBodies;
 using Microsoft.Extensions.Configuration;
 using IceAndFire.Domain.DTO;
 
@@ -74,7 +73,7 @@ namespace IceAndFire.Application.Services
         {
             var response = await _httpClient.GetStringAsync(_apiUrl);
 
-            var apiResponse = JsonSerializer.Deserialize<List<CharacterResponse>>(response, new JsonSerializerOptions
+            var apiResponse = JsonSerializer.Deserialize<List<CharacterDto>>(response, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
@@ -109,21 +108,20 @@ namespace IceAndFire.Application.Services
                 var mappedCharacter = CharacterMapper.MapToEntity(characterFromApi);
                 await _context.Characters.InsertOneAsync(mappedCharacter);
 
-                var characterDto = CharacterMapper.MapToDto(mappedCharacter);
-                _redisCache.Set(id, JsonSerializer.Serialize(characterDto), TimeSpan.FromMinutes(10));
-                return characterDto;
+                _redisCache.Set(id, JsonSerializer.Serialize(characterFromApi), TimeSpan.FromMinutes(10));
+                return characterFromApi;
             }
 
             return null;
         }
 
-        private async Task<CharacterResponse> FetchCharacterFromApiAsync(string id)
+        private async Task<CharacterDto> FetchCharacterFromApiAsync(string id)
         {
             var response = await _httpClient.GetAsync($"{_apiUrl}/{id}");
             if (response.IsSuccessStatusCode)
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<CharacterResponse>(jsonResponse, new JsonSerializerOptions
+                return JsonSerializer.Deserialize<CharacterDto>(jsonResponse, new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });

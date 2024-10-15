@@ -1,6 +1,5 @@
 ﻿using IceAndFire.Domain.DTO;
 using IceAndFire.Domain.Entities;
-using IceAndFire.Domain.ResponseBodies;
 using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
@@ -14,30 +13,6 @@ namespace IceAndFire.Domain.Mappers
 {
     public static class CharacterMapper
     {
-        public static Character MapToEntity(CharacterResponse item)
-        {
-            return new Character
-            {
-                Id = Regex.Match(item.Url, @"/(\d+)").Groups[1].Value,
-                Url = item.Url ?? "",
-                Name = item.Name ?? "",
-                Gender = item.Gender ?? "",
-                Culture = item.Culture ?? "",
-                Born = item.Born ?? "",
-                Died = item.Died ?? "",
-                Titles = item.Titles ?? new List<string>(),
-                Aliases = item.Aliases ?? new List<string>(),
-                Father = item.Father ?? "",
-                Mother = item.Mother ?? "",
-                Spouse = item.Spouse ?? "",
-                Allegiances = item.Allegiances ?? new List<string>(),
-                Books = item.Books ?? new List<string>(),
-                PovBooks = item.PovBooks ?? new List<string>(),
-                TvSeries = item.TvSeries ?? new List<string>(),
-                PlayedBy = item.PlayedBy ?? new List<string>(),
-            };
-        }
-
         public static CharacterDto MapToDto(Character character)
         {
             if (character == null) return null;

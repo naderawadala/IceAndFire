@@ -11,8 +11,10 @@ namespace IceAndFire.Domain.Entities
     public class Book
     {
         [BsonId]
-        public ObjectId ObjectId { get; set; }
-        public string Url { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }  
+
+        public string? Url { get; set; }
         public string Name { get; set; }
         public string Isbn { get; set; }
         public List<string> Authors { get; set; } = new List<string>();

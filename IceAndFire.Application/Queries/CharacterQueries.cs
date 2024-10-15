@@ -8,15 +8,17 @@ using MongoDB.Bson;
 
 namespace IceAndFire.Application.Queries
 {
+    [ExtendObjectType(typeof(Query))]
     public class CharacterQueries
     {
-        public async Task<IEnumerable<Character>> getCharacters([Service] MongoDbContext context)
+        [GraphQLDescription("Get all characters.")]
+        public async Task<IEnumerable<Character>> GetCharacters([Service] MongoDbContext context)
         {
             return await context.Characters.Find(_ => true).ToListAsync();
         }
 
         [GraphQLDescription("Get a character by ID.")]
-        public async Task<Character> getCharacterById(string id, [Service] MongoDbContext context)
+        public async Task<Character> GetCharacterById(string id, [Service] MongoDbContext context)
         {
             return await context.Characters.Find(c => c.Id == id).FirstOrDefaultAsync();
         }
