@@ -1,64 +1,28 @@
-// src/store/charactersSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+const initialState = {
+    items: [],
+    character: null,
+    status: 'idle', // idle | loading | succeeded | failed
+    error: null,
+};
 
 // Fetch all characters
 export const fetchCharacters = createAsyncThunk('characters/fetchCharacters', async () => {
-    const response = await fetch('http://localhost:5000/graphql', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            query: `
-            query {
-              characters {
-                aliases
-                allegiances
-                books
-                born
-                culture
-                died
-                father
-                gender
-                id
-                mother
-                name
-                playedBy
-                povBooks
-                spouse
-                titles
-                tvSeries
-                url
-              }
-            }`,
-        }),
-    });
-    const data = await response.json();
-    return data.data.characters;
+    const response = await axios.get('/api/characters');
+    return response.data;
 });
 
-// Create a new character
-export const createCharacter = createAsyncThunk('characters/createCharacter', async (newCharacter) => {
-    // Implement character creation logic here
-});
-
-// Update an existing character
-export const updateCharacter = createAsyncThunk('characters/updateCharacter', async ({ id, updatedCharacter }) => {
-    // Implement character update logic here
-});
-
-// Delete a character
-export const deleteCharacter = createAsyncThunk('characters/deleteCharacter', async (id) => {
-    // Implement character deletion logic here
+// Fetch character by ID
+export const fetchCharacterById = createAsyncThunk('characters/fetchCharacterById', async (id) => {
+    const response = await axios.get(`/api/characters/${id}`);
+    return response.data;
 });
 
 const charactersSlice = createSlice({
     name: 'characters',
-    initialState: {
-        items: [],
-        status: 'idle',
-        error: null,
-    },
+    initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder
@@ -70,6 +34,17 @@ const charactersSlice = createSlice({
                 state.items = action.payload;
             })
             .addCase(fetchCharacters.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
+            .addCase(fetchCharacterById.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchCharacterById.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.character = action.payload;
+            })
+            .addCase(fetchCharacterById.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             });

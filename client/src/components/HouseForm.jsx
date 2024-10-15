@@ -98,8 +98,10 @@ const HouseForm = () => {
         };
 
         if (isEditMode) {
-            await dispatch(updateHouse({ name: house.name, houseData: payload }));
+            console.log(house)
+            await dispatch(updateHouse({ name: house.name, updatedHouse: payload }));
         } else {
+            console.log("does it even enter?")
             await dispatch(createHouse(payload));
         }
 

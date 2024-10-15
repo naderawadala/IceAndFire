@@ -70,7 +70,7 @@ const HouseDetail = () => {
                 <Accordion.Item eventKey="0">
                     <Accordion.Header>Titles</Accordion.Header>
                     <Accordion.Body>
-                        {house.titles.length > 0 ? (
+                        {house.titles && house.titles.length > 0 ? ( // Check if titles exists
                             <ul>
                                 {house.titles.map((title, index) => (
                                     <li key={index}>{title}</li>
@@ -84,7 +84,7 @@ const HouseDetail = () => {
                 <Accordion.Item eventKey="1">
                     <Accordion.Header>Seats</Accordion.Header>
                     <Accordion.Body>
-                        {house.seats.length > 0 ? (
+                        {house.seats && house.seats.length > 0 ? ( // Check if seats exists
                             <ul>
                                 {house.seats.map((seat, index) => (
                                     <li key={index}>{seat}</li>
@@ -98,7 +98,7 @@ const HouseDetail = () => {
                 <Accordion.Item eventKey="2">
                     <Accordion.Header>Ancestral Weapons</Accordion.Header>
                     <Accordion.Body>
-                        {house.ancestralWeapons.length > 0 ? (
+                        {house.ancestralWeapons && house.ancestralWeapons.length > 0 ? ( // Check if ancestralWeapons exists
                             <ul>
                                 {house.ancestralWeapons.map((weapon, index) => (
                                     <li key={index}>{weapon}</li>
@@ -112,7 +112,7 @@ const HouseDetail = () => {
                 <Accordion.Item eventKey="3">
                     <Accordion.Header>Cadet Branches</Accordion.Header>
                     <Accordion.Body>
-                        {house.cadetBranches.length > 0 ? (
+                        {house.cadetBranches && house.cadetBranches.length > 0 ? ( // Check if cadetBranches exists
                             <ul>
                                 {house.cadetBranches.map((branch, index) => (
                                     <li key={index}>{branch}</li>
@@ -126,7 +126,7 @@ const HouseDetail = () => {
                 <Accordion.Item eventKey="4">
                     <Accordion.Header>Sworn Members</Accordion.Header>
                     <Accordion.Body>
-                        {house.swornMembers.length > 0 ? (
+                        {house.swornMembers && house.swornMembers.length > 0 ? ( // Check if swornMembers exists
                             <ul>
                                 {house.swornMembers.map((member, index) => (
                                     <li key={index}>{member}</li>

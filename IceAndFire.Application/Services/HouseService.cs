@@ -85,6 +85,12 @@ namespace IceAndFire.Application.Services
 
         public async Task<House> CreateHouseAsync(HouseDto houseDto)
         {
+            var existingHouse = await _context.Houses.Find(h =>h.Name.Equals(houseDto.Name)).AnyAsync();
+            if (existingHouse)
+            {
+                throw new InvalidOperationException("A house with this name already exists");
+            }
+
             var houseEntity = HouseMapper.MapToEntity(houseDto);
             await _context.Houses.InsertOneAsync(houseEntity);
 
@@ -100,6 +106,18 @@ namespace IceAndFire.Application.Services
             if (existingHouse == null)
             {
                 return null;
+            }
+
+            if (!existingHouse.Name.Equals(updatedHouseDto.Name))
+            {
+                var nameAlreadyTaken = await _context.Houses
+                    .Find(h => h.Name.Equals(updatedHouseDto.Name))
+                    .FirstOrDefaultAsync();
+
+                if (nameAlreadyTaken != null)
+                {
+                    throw new InvalidOperationException("The house name is already taken by another house.");
+                }
             }
 
             var houseEntity = HouseMapper.MapToEntity(updatedHouseDto, existingHouse.Id);

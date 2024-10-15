@@ -20,7 +20,6 @@ export const fetchHouses = createAsyncThunk('houses/fetchHouses', async () => {
                 founded
                 founder
                 heir
-                id
                 name
                 overlord
                 region
@@ -39,6 +38,7 @@ export const fetchHouses = createAsyncThunk('houses/fetchHouses', async () => {
 
 // Fetch a house by name
 export const fetchHouseByName = createAsyncThunk('houses/fetchHouseByName', async (name) => {
+    console.log(name)
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
         headers: {
@@ -56,7 +56,6 @@ export const fetchHouseByName = createAsyncThunk('houses/fetchHouseByName', asyn
                 founded
                 founder
                 heir
-                id
                 name
                 overlord
                 region
@@ -70,6 +69,7 @@ export const fetchHouseByName = createAsyncThunk('houses/fetchHouseByName', asyn
         }),
     });
     const data = await response.json();
+    console.log(data);
     return data.data.houseByName;
 });
 
@@ -100,8 +100,21 @@ export const createHouse = createAsyncThunk('houses/createHouse', async (newHous
                 titles: ${JSON.stringify(newHouse.titles)},
                 words: "${newHouse.words}"
               }) {
-                id
+                ancestralWeapons
+                cadetBranches
+                coatOfArms
+                currentLord
+                diedOut
+                founded
+                founder
+                heir
                 name
+                overlord
+                region
+                seats
+                swornMembers
+                titles
+                words
               }
             }`,
         }),
@@ -111,7 +124,7 @@ export const createHouse = createAsyncThunk('houses/createHouse', async (newHous
 });
 
 // Update an existing house
-export const updateHouse = createAsyncThunk('houses/updateHouse', async ({ id, updatedHouse }) => {
+export const updateHouse = createAsyncThunk('houses/updateHouse', async ({ name, updatedHouse }) => {
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
         headers: {
@@ -120,7 +133,8 @@ export const updateHouse = createAsyncThunk('houses/updateHouse', async ({ id, u
         body: JSON.stringify({
             query: `
             mutation {
-              updateHouse(name: "${id}", houseDto: {
+              updateHouse(name: "${name}", houseDto: {
+                name: "${updatedHouse.name}"
                 ancestralWeapons: ${JSON.stringify(updatedHouse.ancestralWeapons)},
                 cadetBranches: ${JSON.stringify(updatedHouse.cadetBranches)},
                 coatOfArms: "${updatedHouse.coatOfArms}",
@@ -136,8 +150,21 @@ export const updateHouse = createAsyncThunk('houses/updateHouse', async ({ id, u
                 titles: ${JSON.stringify(updatedHouse.titles)},
                 words: "${updatedHouse.words}"
               }) {
-                id
+                ancestralWeapons
+                cadetBranches
+                coatOfArms
+                currentLord
+                diedOut
+                founded
+                founder
+                heir
                 name
+                overlord
+                region
+                seats
+                swornMembers
+                titles
+                words
               }
             }`,
         }),
@@ -212,7 +239,7 @@ const housesSlice = createSlice({
             .addCase(updateHouse.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 const updatedHouse = action.payload;
-                const existingHouseIndex = state.items.findIndex(house => house.id === updatedHouse.id);
+                const existingHouseIndex = state.items.findIndex(house => house.name === updatedHouse.name);
                 if (existingHouseIndex >= 0) {
                     state.items[existingHouseIndex] = updatedHouse;
                 }
@@ -228,7 +255,7 @@ const housesSlice = createSlice({
             })
             .addCase(deleteHouse.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.items = state.items.filter(house => house.id !== action.payload);
+                state.items = state.items.filter(house => house.name !== action.payload);
             })
             .addCase(deleteHouse.rejected, (state, action) => {
                 state.status = 'failed';

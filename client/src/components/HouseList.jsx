@@ -38,7 +38,7 @@ const HouseList = () => {
             </Button>
             <Row>
                 {houses.map((house) => (
-                    <Col xs={12} md={4} key={house.id}>
+                    <Col xs={12} md={4} key={house.name}>
                         <Card className="mb-4 shadow-sm border-light">
                             <Card.Body>
                                 <Card.Title>{house.name}</Card.Title>

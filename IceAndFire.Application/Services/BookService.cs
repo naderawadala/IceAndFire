@@ -93,6 +93,12 @@ namespace IceAndFire.Application.Services
 
         public async Task<Book> CreateBookAsync(BookDto bookDto)
         {
+            var existingBook = await _context.Books.Find(b => b.Isbn.Equals(bookDto.Isbn)).AnyAsync();
+            if (existingBook)
+            {
+                throw new InvalidOperationException("A book with this ISBN already exists.");
+            }
+
             var bookEntity = BookMapper.MapToEntity(bookDto);
             await _context.Books.InsertOneAsync(bookEntity);
 
@@ -103,19 +109,25 @@ namespace IceAndFire.Application.Services
 
         public async Task<Book> UpdateBookAsync(string isbn, BookDto updatedBookDto)
         {
-            Console.WriteLine("started update");
-            Console.WriteLine(isbn);
             var existingBook = await _context.Books.Find(b => b.Isbn.Equals(isbn)).FirstOrDefaultAsync();
-            Console.WriteLine("reached update 4");
-            Console.WriteLine(existingBook.Id);
-            Console.WriteLine(existingBook.Isbn);
-            Console.WriteLine(existingBook == null);
+            
             if (existingBook == null)
             {
                 return null;
             }
 
-            Console.WriteLine("reached update");
+            if (!existingBook.Isbn.Equals(updatedBookDto.Isbn))
+            {
+                var isbnAlreadyTaken = await _context.Books
+                    .Find(b => b.Isbn.Equals(updatedBookDto.Isbn))
+                    .FirstOrDefaultAsync();
+
+                if (isbnAlreadyTaken != null)
+                {
+                    throw new InvalidOperationException("The book ISBN is already taken by another book.");
+                }
+            }
+
             var bookEntity = BookMapper.MapToEntity(updatedBookDto, existingBook.Id);
 
             var result = await _context.Books.ReplaceOneAsync(b => b.Isbn.Equals(isbn), bookEntity);

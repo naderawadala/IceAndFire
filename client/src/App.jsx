@@ -28,6 +28,7 @@ const App = () => {
                 <Route path="/characters/:id" element={<CharacterDetail />} />
 
                 <Route path="/houses" element={<HouseList />} />
+                <Route path="/houses/new" element={<HouseForm />} />
                 <Route path="/houses/:name" element={<HouseDetail />} />
                 <Route path="/update-house/:name" element={<HouseForm />} />
                 
