@@ -4,7 +4,7 @@ import { Form, Button, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { fetchHouseByName, createHouse, updateHouse, clearHouse, fetchHouses } from '../redux/housesSlice';
+import { fetchHouseByName, createHouse, updateHouse, clearHouse, fetchHouses } from '../redux/housesSlice/housesSlice';
 import houseValidationSchema from '../validation/houseValidationSchema';
 
 const HouseForm = () => {

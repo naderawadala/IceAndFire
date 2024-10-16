@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Card, Spinner, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCharacterByName } from '../redux/charactersSlice';
+import { fetchCharacterByName } from '../redux/charactersSlice/charactersSlice';
 
 const CharacterDetail = () => {
     const { name } = useParams();

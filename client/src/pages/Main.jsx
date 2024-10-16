@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBooks } from '../redux/booksSlice';
-import { fetchCharacters } from '../redux/charactersSlice';
-import { fetchHouses } from '../redux/housesSlice';
+import { fetchBooks } from '../redux/booksSlice/booksSlice';
+import { fetchCharacters } from '../redux/charactersSlice/charactersSlice';
+import { fetchHouses } from '../redux/housesSlice/housesSlice';
 import { useNavigate } from 'react-router-dom';
 
 const Main = () => {

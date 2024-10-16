@@ -3,7 +3,7 @@ import { Link, useNavigate  } from 'react-router-dom';
 import { Navbar, Nav, Button } from 'react-bootstrap';
 import { FaFire, FaSnowflake } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
-import { logoutUser } from '../redux/authSlice'; 
+import { logoutUser } from '../redux/authSlice/authSlice'; 
 import './MyNavbar.css';
 
 const MyNavbar = ({ username }) => {

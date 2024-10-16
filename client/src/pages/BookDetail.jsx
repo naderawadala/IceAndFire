@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Accordion, Spinner, Button, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBookByName, deleteBook } from '../redux/booksSlice';
+import { fetchBookByName, deleteBook } from '../redux/booksSlice/booksSlice';
 
 const BookDetail = () => {
     const { name } = useParams();

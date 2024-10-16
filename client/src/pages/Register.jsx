@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../redux/authSlice';
+import { registerUser } from '../redux/authSlice/authSlice';
 import { useDispatch } from 'react-redux';
 import { Button, Form } from 'react-bootstrap';
 

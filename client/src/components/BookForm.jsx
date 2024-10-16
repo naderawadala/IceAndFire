@@ -4,7 +4,7 @@ import { Form, Button, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { fetchBookByName, createBook, updateBook, clearBook, fetchBooks } from '../redux/booksSlice';
+import { fetchBookByName, createBook, updateBook, clearBook, fetchBooks } from '../redux/booksSlice/booksSlice';
 import bookValidationSchema from '../validation/bookValidationSchema';
 
 const BookForm = () => {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Button, Form, InputGroup, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchHouses, setCurrentPage } from '../redux/housesSlice';
+import { fetchHouses, setCurrentPage } from '../redux/housesSlice/housesSlice';
 
 const HouseList = () => {
     const dispatch = useDispatch();

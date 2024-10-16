@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Accordion, Spinner, Button, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchHouseByName, deleteHouse } from '../redux/housesSlice';
+import { fetchHouseByName, deleteHouse } from '../redux/housesSlice/housesSlice';
 
 const HouseDetail = () => {
     const { name } = useParams();
