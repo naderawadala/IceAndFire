@@ -1,4 +1,4 @@
-﻿using IceAndFire.Domain.DTO;
+using IceAndFire.Domain.DTO;
 using IceAndFire.Domain.Entities;
 using IceAndFire.Domain.Mappers;
 using IceAndFire.Infrastructure.Persistence;
@@ -80,6 +80,10 @@ namespace IceAndFire.Application.Services
 
             user.RefreshToken = GenerateRefreshToken();
             user.RefreshTokenExpiration = DateTime.Now.AddMinutes(7);
+
+            var token = GenerateToken(user);
+            user.Token = token;
+
             await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user);
 
             var token = GenerateToken(user);

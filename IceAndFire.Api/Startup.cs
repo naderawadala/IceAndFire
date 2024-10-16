@@ -1,4 +1,4 @@
-﻿using AppAny.HotChocolate.FluentValidation;
+using AppAny.HotChocolate.FluentValidation;
 using FluentValidation.AspNetCore;
 using IceAndFire.Application.Mutations;
 using IceAndFire.Application.Queries;
@@ -74,7 +74,8 @@ namespace IceAndFire.Api
                          ValidateIssuerSigningKey = true,
                          ValidIssuer = _configuration["Jwt:Issuer"],
                          ValidAudience = _configuration["Jwt:Audience"],
-                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]))
+                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
+                         RoleClaimType = "role"
                      };
                  });
 
