@@ -31,6 +31,8 @@ namespace IceAndFire.Api
             services.Configure<MongoDbSettings>(_configuration.GetSection("MongoDbSettings"));
             services.AddSingleton<MongoDbContext>();
 
+
+
             services.AddScoped<CharacterService>();
             services.AddScoped<BookService>();
             services.AddScoped<HouseService>();
@@ -57,6 +59,9 @@ namespace IceAndFire.Api
                 });
             });
 
+            var getsec = _configuration.GetSection("Jwt");
+            services.Configure<JwtSettings>(_configuration.GetSection("Jwt"));
+            var jwtSettings = getsec.Get<JwtSettings>();
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -66,18 +71,14 @@ namespace IceAndFire.Api
                  {
                      options.RequireHttpsMetadata = false;
                      options.SaveToken = true;
-                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                     options.TokenValidationParameters = new TokenValidationParameters
                      {
-                         ValidateIssuer = true,
-                         ValidateAudience = true,
-                         ValidateLifetime = true,
+                         ValidateIssuer = false,
+                         ValidateAudience = false,
                          ValidateIssuerSigningKey = true,
-                         ValidIssuer = _configuration["Jwt:Issuer"],
-                         ValidAudience = _configuration["Jwt:Audience"],
-                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
-                         RoleClaimType = "role"
+                         IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(jwtSettings.Key)),
                      };
-                 });
+            });
 
             services.AddFluentValidation();
             services.AddTransient<BookInputValidator>();

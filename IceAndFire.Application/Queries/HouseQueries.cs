@@ -23,7 +23,7 @@ namespace IceAndFire.Application.Queries
         [GraphQLDescription("Get all houses.")]
         public async Task<IEnumerable<House>> GetHouses(int pageNumber = 1, int pageSize = 10)
         {
-            IEnumerable<House> houses = await this._service.GetHousesAsync(pageNumber, pageSize);
+            IEnumerable<House> houses = await this._service.GetHousesAsync();
             return houses;
         }
 

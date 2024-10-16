@@ -1,4 +1,5 @@
-﻿using IceAndFire.Domain.Entities;
+﻿using HotChocolate.Authorization;
+using IceAndFire.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,8 @@ namespace IceAndFire.Application.Queries
 {
     public class Query
     {
-        public string Test(String name) {
+        [Authorize]
+        public string Test() {
             return "TestForNow";
         }
     }

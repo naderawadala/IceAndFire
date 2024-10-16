@@ -1,9 +1,11 @@
 ﻿using IceAndFire.Domain.DTO;
 using IceAndFire.Domain.Entities;
 using IceAndFire.Domain.Mappers;
+using IceAndFire.Infrastructure.Config;
 using IceAndFire.Infrastructure.Persistence;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -23,11 +25,13 @@ namespace IceAndFire.Application.Services
         private readonly MongoDbContext _context;
         private readonly IConfiguration _config;
         private readonly IPasswordHasher _passwordHasher;
-        public UserService(MongoDbContext context, IConfiguration config, IPasswordHasher passwordHasher)
+        private readonly JwtSettings _jwtSettings;
+        public UserService(MongoDbContext context, IConfiguration config, IPasswordHasher passwordHasher, IOptions<JwtSettings> _jwtSettings)
         {
             _context = context;
             _config = config;
             _passwordHasher = passwordHasher;
+            _jwtSettings = _jwtSettings;
         }
 
         public async Task<User> RegisterUserAsync(UserDto userDto)
@@ -95,18 +99,31 @@ namespace IceAndFire.Application.Services
 
         public string GenerateToken(User user)
         {
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.Key);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+
+            /*
             Console.WriteLine("back to gen token");
             var claims = new[]
             {
-            new Claim("subject", user.Username),
-            new Claim("jti", user.Id.ToString()),
-            new Claim("role", user.Role)
-        };
+                new Claim("subject", user.Username),
+                new Claim("jti", user.Id.ToString()),
+                new Claim("role", user.Role)
+            };
 
             //var keyBytes = GenerateSecureKey(256); 
             //byte[] keyBytes = Convert.FromBase64String(_config["Jwt:Key"]);
            // var key = new SymmetricSecurityKey(keyBytes);
-            var key = new SymmetricSecurityKey(ConvertHexStringToByteArray(_config["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(ConvertHexStringToByteArray(_config));
             Console.WriteLine($"Key Length: {key.KeySize} bits");
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -118,7 +135,7 @@ namespace IceAndFire.Application.Services
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
 
-            return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+            return new JwtSecurityTokenHandler().WriteToken(jwtToken); */
         }
 
         public string GenerateRefreshToken()
@@ -183,7 +200,8 @@ namespace IceAndFire.Application.Services
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(ConvertHexStringToByteArray(_config["Jwt:Key"])),
+                //IssuerSigningKey = new SymmetricSecurityKey(ConvertHexStringToByteArray(_config["Jwt:Key"])),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"])),
                 ValidateLifetime = false
             };
 
