@@ -87,6 +87,28 @@ const HouseForm = () => {
         }
     }, [house]);
 
+    const handleBack = () => {
+        // Navigate back and clear form data
+        setInitialFormData({
+            name: '',
+            region: '',
+            coatOfArms: '',
+            words: '',
+            titles: '',
+            seats: '',
+            currentLord: '',
+            heir: '',
+            overlord: '',
+            founded: '',
+            founder: '',
+            diedOut: '',
+            ancestralWeapons: '',
+            cadetBranches: '',
+            swornMembers: '',
+        });
+        navigate('/houses'); // Navigate to the houses list page
+    };
+
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         const payload = {
             ...values,
@@ -98,10 +120,8 @@ const HouseForm = () => {
         };
 
         if (isEditMode) {
-            console.log(house)
             await dispatch(updateHouse({ name: house.name, updatedHouse: payload }));
         } else {
-            console.log("does it even enter?")
             await dispatch(createHouse(payload));
         }
 
@@ -123,7 +143,7 @@ const HouseForm = () => {
             <h2>{isEditMode ? 'Update House' : 'Create House'}</h2>
             <Formik
                 initialValues={initialFormData}
-                validationSchema={houseValidationSchema} // Assume there's a validation schema
+                validationSchema={houseValidationSchema}
                 onSubmit={handleSubmit}
                 enableReinitialize
             >
@@ -294,6 +314,10 @@ const HouseForm = () => {
 
                         <Button variant="primary" type="submit" className="mt-4" disabled={isSubmitting}>
                             {isEditMode ? 'Update House' : 'Create House'}
+                        </Button>
+
+                        <Button variant="secondary" type="button" className="mt-4 ms-2" onClick={handleBack}>
+                            Back
                         </Button>
                     </Form>
                 )}

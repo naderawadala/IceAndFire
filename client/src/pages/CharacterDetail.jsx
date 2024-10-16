@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Card, Spinner } from 'react-bootstrap';
+import { Container, Card, Spinner, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCharacterById } from '../redux/charactersSlice'; // Import the fetch action
+import { fetchCharacterByName } from '../redux/charactersSlice'; // Import the fetch action
 
 const CharacterDetail = () => {
-    const { id } = useParams();
+    const { name } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -15,8 +15,8 @@ const CharacterDetail = () => {
     const error = useSelector((state) => state.characters.error);
 
     useEffect(() => {
-        dispatch(fetchCharacterById(id)); // Fetch character details by id
-    }, [dispatch, id]);
+        dispatch(fetchCharacterByName(name)); // Fetch character details by name
+    }, [dispatch, name]);
 
     // Handle loading and error states
     if (loading) {
@@ -33,6 +33,14 @@ const CharacterDetail = () => {
 
     return (
         <Container className="my-4">
+            <Button 
+                variant="outline-secondary" 
+                onClick={() => navigate('/characters')} // Navigate to the character list
+                className="mb-4" 
+                style={{ padding: '0.375rem 1rem' }} // Maintain consistent padding
+            >
+                <i className="bi bi-arrow-left"></i> Go Back
+            </Button>
             <h1>{character.name}</h1>
             <Card>
                 <Card.Body>
@@ -47,9 +55,7 @@ const CharacterDetail = () => {
                         <strong>Father:</strong> {character.father || 'Unknown'}<br />
                         <strong>Mother:</strong> {character.mother || 'Unknown'}<br />
                         <strong>Spouse:</strong> {character.spouse || 'Unknown'}<br />
-                        <strong>Siblings:</strong> {character.siblings.length > 0 ? character.siblings.join(", ") : 'No Siblings'}<br />
                         <strong>Allegiances:</strong> {character.allegiances.length > 0 ? character.allegiances.join(", ") : 'No Allegiances'}<br />
-                        <strong>URL:</strong> <a href={character.url} target="_blank" rel="noopener noreferrer">{character.url}</a>
                     </Card.Text>
                 </Card.Body>
             </Card>

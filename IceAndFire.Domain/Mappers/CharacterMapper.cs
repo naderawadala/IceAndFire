@@ -19,7 +19,6 @@ namespace IceAndFire.Domain.Mappers
 
             return new CharacterDto
             {
-                Url = character.Url,
                 Name = character.Name,
                 Gender = character.Gender,
                 Culture = character.Culture,
@@ -45,7 +44,6 @@ namespace IceAndFire.Domain.Mappers
             return new Character
             {
                 Id = string.IsNullOrEmpty(Id) ? ObjectId.GenerateNewId().ToString() : Id,
-                Url = dto.Url,
                 Name = dto.Name,
                 Gender = dto.Gender,
                 Culture = dto.Culture,

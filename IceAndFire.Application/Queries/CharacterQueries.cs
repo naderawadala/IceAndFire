@@ -23,7 +23,7 @@ namespace IceAndFire.Application.Queries
             return await _service.GetCharactersAsync();
         }
 
-        [GraphQLDescription("Get a character by ID.")]
+        [GraphQLDescription("Get a character by Name.")]
         public async Task<Character> GetCharacterByName(string name, [Service] MongoDbContext context)
         {
             return await _service.GetCharacterByNameAsync(name);

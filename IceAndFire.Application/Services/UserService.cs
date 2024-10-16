@@ -5,6 +5,7 @@ using IceAndFire.Infrastructure.Persistence;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -31,26 +32,45 @@ namespace IceAndFire.Application.Services
 
         public async Task<User> RegisterUserAsync(UserDto userDto)
         {
-            Console.WriteLine("reach first?");
+            Console.WriteLine("Reach first?");
+
+            // Check if the username already exists
             var existingUser = await _context.Users
-            .Find(u => u.Username == userDto.Username)
-            .FirstOrDefaultAsync();
+                .Find(u => u.Username == userDto.Username)
+                .FirstOrDefaultAsync();
 
             if (existingUser != null)
             {
                 throw new Exception("Username already exists.");
             }
-            Console.WriteLine("reach here");
 
+            Console.WriteLine("Reach here");
+
+            // Hash the password
             userDto.Password = _passwordHasher.HashPassword(userDto.Password);
             var user = UserMapper.MapToEntity(userDto);
-            Console.WriteLine("reached here");
+
+            // Check if this is the first user
+            var userCount = await _context.Users.CountDocumentsAsync(new BsonDocument());
+            if (userCount == 0)
+            {
+                user.Role = "Admin"; // First user becomes admin
+            }
+            else
+            {
+                user.Role = "User"; // Subsequent users are regular users
+            }
+
+            Console.WriteLine("Reached here");
+
+            // Insert the new user into the database
             await _context.Users.InsertOneAsync(user);
 
             return user;
         }
 
-        public async Task<string> LoginAsync(LoginDto loginDto)
+
+        public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto)
         {
             var user = await _context.Users.Find(u => u.Username == loginDto.Username).FirstOrDefaultAsync();
             if (user == null || _passwordHasher.VerifyHashedPassword(user.Password, loginDto.Password) != PasswordVerificationResult.Success)
@@ -62,10 +82,15 @@ namespace IceAndFire.Application.Services
             user.RefreshTokenExpiration = DateTime.Now.AddMinutes(7);
             await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user);
 
-            Console.WriteLine("reached end 1");
+            var token = GenerateToken(user);
 
-            return GenerateToken(user);
+            return new LoginResponseDto
+            {
+                Token = token,
+                Role = user.Role
+            };
         }
+
 
 
         public string GenerateToken(User user)
@@ -74,7 +99,8 @@ namespace IceAndFire.Application.Services
             var claims = new[]
             {
             new Claim("subject", user.Username),
-            new Claim("jti", user.Id.ToString())
+            new Claim("jti", user.Id.ToString()),
+            new Claim("role", user.Role)
         };
 
             //var keyBytes = GenerateSecureKey(256); 

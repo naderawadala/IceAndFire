@@ -28,14 +28,31 @@ const CharacterList = () => {
 
     return (
         <section className="mt-5">
-            <h2>CHARACTERS</h2>
+            {/* Go Back Button */}
             <Button 
-                variant="success" 
-                className="mb-3" 
-                onClick={() => navigate('/characters/new')}
+                variant="outline-secondary" 
+                onClick={() => navigate('/')}
+                className="mb-4" 
+                title="Return to Home"
+                style={{ display: 'inline-flex', alignItems: 'center' }}
             >
-                Create Character
+                <i className="bi bi-arrow-left me-2"></i> Go Back
             </Button>
+
+            {/* Characters Header and Create Character Button */}
+            <div className="d-flex align-items-center mb-3">
+                <h2 className="mb-0 me-2">CHARACTERS</h2>
+                <Button 
+                    variant="success" 
+                    title="Create Character" 
+                    onClick={() => navigate('/characters/new')}
+                    className="btn-sm" // Make button smaller
+                >
+                    <i className="bi bi-plus"></i>
+                </Button>
+            </div>
+
+            {/* Characters List */}
             <Row>
                 {characters.map((character) => (
                     <Col xs={12} md={4} key={character.name}>
@@ -52,7 +69,7 @@ const CharacterList = () => {
                                 </Card.Text>
                                 <Button 
                                     variant="primary" 
-                                    onClick={() => navigate(`/characters/${character.id}`)}
+                                    onClick={() => navigate(`/characters/${character.name}`)}
                                 >
                                     Details
                                 </Button>

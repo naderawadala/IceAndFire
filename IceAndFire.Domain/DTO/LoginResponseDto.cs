@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace IceAndFire.Domain.DTO
 {
-    public record LoginDto
+    public class LoginResponseDto
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
-
+        public string Token { get; set; }
+        public string Role { get; set; }
     }
 }

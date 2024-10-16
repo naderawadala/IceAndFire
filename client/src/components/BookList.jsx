@@ -28,14 +28,31 @@ const BookList = () => {
 
     return (
         <section className="mt-5">
-            <h2>BOOKS</h2>
+            {/* Go Back Button */}
             <Button 
-                variant="success" 
-                className="mb-3" 
-                onClick={() => navigate('/books/new')}
+                variant="outline-secondary" 
+                onClick={() => navigate('/')}
+                className="mb-4" 
+                title="Return to Home"
+                style={{ display: 'inline-flex', alignItems: 'center' }}
             >
-                Create Book
+                <i className="bi bi-arrow-left me-2"></i> Go Back
             </Button>
+
+            {/* Books Header and Create Book Button */}
+            <div className="d-flex align-items-center mb-3">
+                <h2 className="mb-0 me-2">BOOKS</h2>
+                <Button 
+                    variant="success" 
+                    title="Create Book" 
+                    onClick={() => navigate('/books/new')}
+                    className="btn-sm" // Make button smaller
+                >
+                    <i className="bi bi-plus"></i>
+                </Button>
+            </div>
+
+            {/* Books List */}
             <Row>
                 {books.map((book) => (
                     <Col xs={12} md={4} key={book.isbn}>

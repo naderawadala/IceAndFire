@@ -1,0 +1,56 @@
+// Register.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../redux/authSlice'; // Import your redux action
+import { useDispatch } from 'react-redux';
+import { Button, Form } from 'react-bootstrap'; // Using React Bootstrap for styling
+
+const Register = () => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await dispatch(registerUser({ username, password })).unwrap();
+            navigate('/'); // Redirect to login after successful registration
+        } catch (error) {
+            console.error('Registration failed:', error);
+        }
+    };
+
+    return (
+        <div className="container mt-5" style={{ maxWidth: '400px', margin: '0 auto' }}>
+            <h2 className="mb-4">Register</h2>
+            <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="formUsername" className="mb-3">
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Enter username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                    />
+                </Form.Group>
+                <Form.Group controlId="formPassword" className="mb-3">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                    Register
+                </Button>
+            </Form>
+        </div>
+    );
+};
+
+export default Register;

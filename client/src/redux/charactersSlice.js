@@ -28,7 +28,6 @@ export const fetchCharacters = createAsyncThunk('characters/fetchCharacters', as
                 spouse
                 titles
                 tvSeries
-                url
               }
             }`,
         }),
@@ -38,7 +37,7 @@ export const fetchCharacters = createAsyncThunk('characters/fetchCharacters', as
 });
 
 // Fetch character by ID
-export const fetchCharacterById = createAsyncThunk('characters/fetchCharacterById', async (id) => {
+export const fetchCharacterByName = createAsyncThunk('characters/fetchCharacterByName', async (name) => {
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
         headers: {
@@ -47,7 +46,7 @@ export const fetchCharacterById = createAsyncThunk('characters/fetchCharacterByI
         body: JSON.stringify({
             query: `
             query {
-              character(id: "${id}") {
+              characterByName(name: "${name}") {
                 aliases
                 allegiances
                 books
@@ -56,7 +55,6 @@ export const fetchCharacterById = createAsyncThunk('characters/fetchCharacterByI
                 died
                 father
                 gender
-                id
                 mother
                 name
                 playedBy
@@ -64,13 +62,13 @@ export const fetchCharacterById = createAsyncThunk('characters/fetchCharacterByI
                 spouse
                 titles
                 tvSeries
-                url
               }
             }`,
         }),
     });
     const data = await response.json();
-    return data.data.character; // Return the character by ID
+    console.log(data)
+    return data.data.characterByName; // Return the character by name
 });
 
 // Character slice setup (initial state and reducers)
@@ -78,7 +76,7 @@ const charactersSlice = createSlice({
     name: 'characters',
     initialState: {
         character: null,
-        characters: [],
+        items: [],
         status: 'idle',
         error: null,
     },
@@ -90,20 +88,20 @@ const charactersSlice = createSlice({
             })
             .addCase(fetchCharacters.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.characters = action.payload; // Store fetched characters
+                state.items = action.payload; // Store fetched characters
             })
             .addCase(fetchCharacters.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             })
-            .addCase(fetchCharacterById.pending, (state) => {
+            .addCase(fetchCharacterByName.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(fetchCharacterById.fulfilled, (state, action) => {
+            .addCase(fetchCharacterByName.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.character = action.payload; // Store fetched character by ID
             })
-            .addCase(fetchCharacterById.rejected, (state, action) => {
+            .addCase(fetchCharacterByName.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             });

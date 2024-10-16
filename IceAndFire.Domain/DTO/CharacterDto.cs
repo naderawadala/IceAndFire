@@ -8,7 +8,6 @@ namespace IceAndFire.Domain.DTO
 {
     public record CharacterDto
     {
-        public string? Url { get; set; }
         public required string Name { get; set; }
         public string? Gender { get; set; }
         public string? Culture { get; set; }
