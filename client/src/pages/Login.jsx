@@ -16,7 +16,8 @@ const Login = () => {
         try {
             const token = await dispatch(loginUser({ username, password })).unwrap();
             // Store the token in local storage for further requests
-            localStorage.setItem('token', token);
+            console.log(token.token)
+            localStorage.setItem('token', token.token);
             //window.location.reload(); // Full page refresh
         } catch (error) {
             console.error('Login failed:', error);
