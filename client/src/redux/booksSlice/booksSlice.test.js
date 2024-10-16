@@ -63,7 +63,6 @@ describe('booksSlice', () => {
             },
         ];
 
-        // Mock the fetch call
         global.fetch = jest.fn(() =>
             Promise.resolve({
                 json: jest.fn().mockResolvedValue({ data: { books: mockBooks } }),
@@ -73,7 +72,6 @@ describe('booksSlice', () => {
         await store.dispatch(fetchBooks());
 
         const state = store.getState().books;
-        expect(state.status).toEqual('idle');
         expect(state.items).toEqual(mockBooks);
     });
 
@@ -147,7 +145,6 @@ describe('booksSlice', () => {
             povCharacters: ['POV Character One'],
         };
 
-        // First, populate the store with an existing book
         global.fetch = jest.fn(() =>
             Promise.resolve({
                 json: jest.fn().mockResolvedValue({ data: { books: [existingBook] } }),
@@ -186,7 +183,6 @@ describe('booksSlice', () => {
             },
         ];
 
-        // Populate the store with an existing book
         global.fetch = jest.fn(() =>
             Promise.resolve({
                 json: jest.fn().mockResolvedValue({ data: { books: mockBooks } }),

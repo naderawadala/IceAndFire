@@ -16,7 +16,6 @@ describe('charactersSlice', () => {
             },
         });
 
-        // Mock global fetch
         global.fetch = jest.fn();
     });
 
@@ -55,24 +54,20 @@ describe('charactersSlice', () => {
             {
                 name: 'Character 1',
                 id: 1,
-                // Add other fields as necessary
             },
             {
                 name: 'Character 2',
                 id: 2,
-                // Add other fields as necessary
             },
         ];
 
         it('should handle fetchCharacters', async () => {
-            // Mock fetch response
             fetch.mockResolvedValueOnce({
                 json: jest.fn().mockResolvedValueOnce({
                     data: { characters: mockCharacters },
                 }),
             });
 
-            // Dispatch the thunk
             await store.dispatch(fetchCharacters());
 
             const state = store.getState().characters;
@@ -84,7 +79,6 @@ describe('charactersSlice', () => {
             const errorMessage = 'Failed to fetch';
             fetch.mockRejectedValueOnce(new Error(errorMessage));
 
-            // Dispatch the thunk
             await store.dispatch(fetchCharacters());
 
             const state = store.getState().characters;
@@ -97,17 +91,14 @@ describe('charactersSlice', () => {
             const mockCharacter = {
                 name: characterName,
                 id: 1,
-                // Add other fields as necessary
             };
 
-            // Mock fetch response
             fetch.mockResolvedValueOnce({
                 json: jest.fn().mockResolvedValueOnce({
                     data: { characterByName: mockCharacter },
                 }),
             });
 
-            // Dispatch the thunk
             await store.dispatch(fetchCharacterByName(characterName));
 
             const state = store.getState().characters;
@@ -120,7 +111,6 @@ describe('charactersSlice', () => {
             const characterName = 'Unknown Character';
             fetch.mockRejectedValueOnce(new Error(errorMessage));
 
-            // Dispatch the thunk
             await store.dispatch(fetchCharacterByName(characterName));
 
             const state = store.getState().characters;

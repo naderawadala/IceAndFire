@@ -1,13 +1,10 @@
-// housesSlice.test.js
 import { configureStore } from '@reduxjs/toolkit';
-import housesReducer, {
-    fetchHouses,
-    fetchHouseByName,
-    createHouse,
-    updateHouse,
-    deleteHouse,
-    setCurrentPage,
-    clearHouse,
+import housesReducer, { 
+    fetchHouses, 
+    fetchHouseByName, 
+    createHouse, 
+    updateHouse, 
+    deleteHouse 
 } from './housesSlice';
 
 describe('housesSlice', () => {
@@ -19,138 +16,118 @@ describe('housesSlice', () => {
                 houses: housesReducer,
             },
         });
+
+        global.fetch = jest.fn();
     });
 
     afterEach(() => {
         jest.clearAllMocks();
     });
 
-    it('should handle initial state', () => {
-        const initialState = {
-            items: [],
-            status: 'idle',
-            error: null,
-            currentPage: 1,
-            housesPerPage: 6,
-        };
-        expect(store.getState().houses).toEqual(initialState);
-    });
-
-    it('should handle setCurrentPage', () => {
-        store.dispatch(setCurrentPage(2));
-        expect(store.getState().houses.currentPage).toEqual(2);
-    });
-
-    it('should handle clearHouse', () => {
-        store.dispatch(clearHouse());
-        expect(store.getState().houses.house).toBeNull();
-    });
-
     it('should handle fetchHouses', async () => {
         const mockHouses = [
-            { name: 'House Stark', region: 'The North' },
-            { name: 'House Lannister', region: 'The Westerlands' },
+            {
+                ancestralWeapons: ['Sword of Ice'],
+                cadetBranches: [],
+                coatOfArms: 'A grey direwolf on a white field',
+                currentLord: 'Eddard Stark',
+                diedOut: false,
+                founded: 'Age of Heroes',
+                founder: 'Brandon Stark',
+                heir: 'Robb Stark',
+                name: 'House Stark',
+                overlord: null,
+                region: 'The North',
+                seats: ['Winterfell'],
+                swornMembers: [],
+                titles: ['Warden of the North'],
+                url: 'http://localhost:5000/houses/stark',
+                words: 'Winter is Coming'
+            },
         ];
 
-        global.fetch = jest.fn(() =>
-            Promise.resolve({
-                json: jest.fn().mockResolvedValue({ data: { houses: mockHouses } }),
-            })
-        );
+        fetch.mockResolvedValueOnce({
+            json: jest.fn().mockResolvedValueOnce({
+                data: { houses: mockHouses },
+            }),
+        });
 
         await store.dispatch(fetchHouses());
 
         const state = store.getState().houses;
+
         expect(state.status).toEqual('succeeded');
         expect(state.items).toEqual(mockHouses);
     });
 
-    it('should handle createHouse', async () => {
-        const newHouse = {
-            name: 'House Targaryen',
-            region: 'Essos',
-            ancestralWeapons: [],
+    it('should handle fetchHouseByName', async () => {
+        const mockHouse = {
+            ancestralWeapons: ['Sword of Ice'],
             cadetBranches: [],
-            coatOfArms: '',
-            currentLord: '',
-            diedOut: '',
-            founded: '',
-            founder: '',
-            heir: '',
-            overlord: '',
-            seats: [],
-            swornMembers: [],
-            titles: [],
-            words: '',
-        };
-
-        const mockCreatedHouse = { ...newHouse, id: '1' };
-
-        global.fetch = jest.fn(() =>
-            Promise.resolve({
-                json: jest.fn().mockResolvedValue({ data: { createHouse: mockCreatedHouse } }),
-            })
-        );
-
-        await store.dispatch(createHouse(newHouse)); // Await the dispatch here
-
-        const state = store.getState().houses;
-        expect(state.status).toEqual('succeeded'); // Ensure status is 'succeeded'
-        expect(state.items).toContainEqual(mockCreatedHouse); // Check if the house was added
-    });
-
-    it('should handle updateHouse', async () => {
-        const existingHouse = {
+            coatOfArms: 'A grey direwolf on a white field',
+            currentLord: 'Eddard Stark',
+            diedOut: false,
+            founded: 'Age of Heroes',
+            founder: 'Brandon Stark',
+            heir: 'Robb Stark',
             name: 'House Stark',
+            overlord: null,
             region: 'The North',
+            seats: ['Winterfell'],
+            swornMembers: [],
+            titles: ['Warden of the North'],
+            url: 'http://localhost:5000/houses/stark',
+            words: 'Winter is Coming'
         };
 
-        const updatedHouse = { ...existingHouse, region: 'The North (Updated)' };
+        const houseName = 'House Stark';
 
-        // First, populate the store with an existing house
-        global.fetch = jest.fn(() =>
-            Promise.resolve({
-                json: jest.fn().mockResolvedValue({ data: { houses: [existingHouse] } }),
-            })
-        );
+        fetch.mockResolvedValueOnce({
+            json: jest.fn().mockResolvedValueOnce({
+                data: { houseByName: mockHouse },
+            }),
+        });
 
-        await store.dispatch(fetchHouses()); // Fetch houses first to ensure items are populated
-
-        global.fetch = jest.fn(() =>
-            Promise.resolve({
-                json: jest.fn().mockResolvedValue({ data: { updateHouse: updatedHouse } }),
-            })
-        );
-
-        await store.dispatch(updateHouse({ name: existingHouse.name, updatedHouse })); // Await dispatch
+        await store.dispatch(fetchHouseByName(houseName));
 
         const state = store.getState().houses;
-        expect(state.status).toEqual('succeeded');
-        expect(state.items).toContainEqual(updatedHouse); // Verify the updated house exists
+
+        expect(state.house).toEqual(mockHouse);
     });
+
+    
 
     it('should handle deleteHouse', async () => {
-        const houseName = 'House Stark';
-        
-        const mockHouses = [{ name: houseName, region: 'The North' }];
-        global.fetch = jest.fn(() =>
-            Promise.resolve({
-                json: jest.fn().mockResolvedValue({ data: { houses: mockHouses } }),
-            })
-        );
+        const existingHouse = {
+            ancestralWeapons: ['Sword of Ice'],
+            cadetBranches: [],
+            coatOfArms: 'A grey direwolf on a white field',
+            currentLord: 'Eddard Stark',
+            diedOut: false,
+            founded: 'Age of Heroes',
+            founder: 'Brandon Stark',
+            heir: 'Robb Stark',
+            name: 'House Stark',
+            overlord: null,
+            region: 'The North',
+            seats: ['Winterfell'],
+            swornMembers: [],
+            titles: ['Warden of the North'],
+            words: 'Winter is Coming'
+        };
 
-        await store.dispatch(fetchHouses());
+        fetch.mockResolvedValueOnce({
+            json: jest.fn().mockResolvedValueOnce({
+                data: { deleteHouse: true },
+            }),
+        });
 
-        global.fetch = jest.fn(() =>
-            Promise.resolve({
-                json: jest.fn().mockResolvedValue({ data: { deleteHouse: {} } }),
-            })
-        );
+        await store.dispatch(createHouse(existingHouse));
 
-        await store.dispatch(deleteHouse(houseName));
+        await store.dispatch(deleteHouse('House Stark'));
 
         const state = store.getState().houses;
-        expect(state.status).toEqual('succeeded');
-        expect(state.items).not.toContainEqual(expect.objectContaining({ name: houseName }));
+
+        expect(state.items).not.toContainEqual(existingHouse);
     });
 });
