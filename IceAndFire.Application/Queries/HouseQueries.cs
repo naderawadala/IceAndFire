@@ -21,11 +21,12 @@ namespace IceAndFire.Application.Queries
         }
 
         [GraphQLDescription("Get all houses.")]
-        public async Task<IEnumerable<House>> GetHouses([Service] MongoDbContext context)
+        public async Task<IEnumerable<House>> GetHouses(int pageNumber = 1, int pageSize = 10)
         {
-            IEnumerable<House> houses = await this._service.GetHousesAsync();
+            IEnumerable<House> houses = await this._service.GetHousesAsync(pageNumber, pageSize);
             return houses;
         }
+
 
         [GraphQLDescription("Get a house by name.")]
         public async Task<House> GetHouseByName(string name, [Service] MongoDbContext context)

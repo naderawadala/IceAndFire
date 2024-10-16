@@ -67,6 +67,7 @@ export const fetchCharacterByName = createAsyncThunk('characters/fetchCharacterB
     return data.data.characterByName;
 });
 
+
 const charactersSlice = createSlice({
     name: 'characters',
     initialState: {
@@ -74,8 +75,17 @@ const charactersSlice = createSlice({
         items: [],
         status: 'idle',
         error: null,
+        currentPage: 1,
+        charactersPerPage: 10,
     },
-    reducers: {},
+    reducers: {
+        setCurrentPage(state, action) {
+            state.currentPage = action.payload;
+        },
+        clearCharacter(state) {
+            state.character = null;
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchCharacters.pending, (state) => {
@@ -102,5 +112,7 @@ const charactersSlice = createSlice({
             });
     },
 });
+
+export const { setCurrentPage, clearCharacter } = charactersSlice.actions;
 
 export default charactersSlice.reducer;

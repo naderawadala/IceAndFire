@@ -2,47 +2,63 @@ import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Button, Form, InputGroup, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchHouses } from '../redux/housesSlice';
+import { fetchCharacters, setCurrentPage } from '../redux/charactersSlice';
 
-const HouseList = () => {
+const CharacterList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const houses = useSelector((state) => state.houses.items) || []; 
-    const houseStatus = useSelector((state) => state.houses.status);
-    const error = useSelector((state) => state.houses.error);
-
+    const characters = useSelector((state) => state.characters.items) || [];
+    const characterStatus = useSelector((state) => state.characters.status);
+    const error = useSelector((state) => state.characters.error);
+    const currentPage = useSelector((state) => state.characters.currentPage);
+    const charactersPerPage = useSelector((state) => state.characters.charactersPerPage);
 
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        if (houseStatus === 'idle') {
-            dispatch(fetchHouses());
+        if (characterStatus === 'idle') {
+            dispatch(fetchCharacters());
         }
-    }, [houseStatus, dispatch]);
+    }, [characterStatus, dispatch]);
 
 
-    if (houseStatus === 'loading') {
-        return <p>Loading houses...</p>;
+    useEffect(() => {
+        if (searchTerm) {
+            dispatch(setCurrentPage(1));
+        }
+    }, [searchTerm, dispatch]);
+
+    if (characterStatus === 'loading') {
+        return <p>Loading characters...</p>;
     }
 
-    if (houseStatus === 'failed') {
+    if (characterStatus === 'failed') {
         return <p>Error: {error}</p>;
     }
 
-    const filteredHouses = houses.filter((house) => {
+    const filteredCharacters = characters.filter((character) => {
         const searchTermLower = searchTerm.toLowerCase();
-        const houseName = house.name.toLowerCase();
-
-        return houseName.includes(searchTermLower);
+        const characterName = character.name.toLowerCase();
+        return characterName.includes(searchTermLower);
     });
+
+    const totalPages = Math.ceil(filteredCharacters.length / charactersPerPage);
+    const startIndex = (currentPage - 1) * charactersPerPage;
+    const currentCharacters = filteredCharacters.slice(startIndex, startIndex + charactersPerPage);
+
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= totalPages) {
+            dispatch(setCurrentPage(page));
+        }
+    };
 
     return (
         <section className="mt-5">
             <Container>
-                <Button 
-                    variant="outline-secondary" 
+                <Button
+                    variant="outline-secondary"
                     onClick={() => navigate('/')}
-                    className="mb-4" 
+                    className="mb-4"
                     title="Return to Home"
                     style={{ display: 'inline-flex', alignItems: 'center' }}
                 >
@@ -51,17 +67,17 @@ const HouseList = () => {
 
                 <Row className="align-items-center mb-3">
                     <Col xs={12} md={4} className="d-flex align-items-center">
-                        <h2 className="mb-0">HOUSES</h2>
+                        <h2 className="mb-0">CHARACTERS</h2>
                     </Col>
 
                     <Col xs={12} md={4} className="d-flex justify-content-center">
                         <InputGroup style={{ width: '300px' }}>
                             <Form.Control
                                 type="text"
-                                placeholder="Search houses by name..."
+                                placeholder="Search characters by name..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{ height: '36px' }} 
+                                style={{ height: '36px' }}
                             />
                             <Button variant="outline-secondary" disabled>
                                 <i className="bi bi-search"></i>
@@ -70,10 +86,10 @@ const HouseList = () => {
                     </Col>
 
                     <Col xs={12} md={4} className="text-md-end">
-                        <Button 
-                            variant="success" 
-                            title="Create House" 
-                            onClick={() => navigate('/houses/new')}
+                        <Button
+                            variant="success"
+                            title="Create Character"
+                            onClick={() => navigate('/characters/new')}
                             className="btn-lg"
                         >
                             <i className="bi bi-plus"></i>
@@ -82,24 +98,24 @@ const HouseList = () => {
                 </Row>
 
                 <Row className="g-4">
-                    {filteredHouses.length > 0 ? (
-                        filteredHouses.map((house) => (
-                            <Col xs={12} md={4} key={house.name}>
+                    {currentCharacters.length > 0 ? (
+                        currentCharacters.map((character) => (
+                            <Col xs={12} md={4} key={character.name}>
                                 <Card className="mb-4 shadow-sm border-light">
                                     <Card.Body>
-                                        <Card.Title>{house.name}</Card.Title>
+                                        <Card.Title>{character.name}</Card.Title>
                                         <Card.Subtitle className="mb-2 text-muted">
-                                            {house.founder ? `Founder: ${house.founder}` : 'Founder Unknown'}
+                                            {character.founder ? `Founder: ${character.founder}` : 'Founder Unknown'}
                                         </Card.Subtitle>
                                         <Card.Text>
-                                            <strong>Region:</strong> {house.region} <br />
-                                            <strong>Seats:</strong> {house.seats ? house.seats.join(", ") : 'Unknown'} <br />
-                                            <strong>Founded:</strong> {house.founded ? house.founded : 'Unknown'} <br />
-                                            <strong>Words:</strong> {house.words || 'No words known'}
+                                            <strong>Region:</strong> {character.region || 'Unknown'} <br />
+                                            <strong>Titles:</strong> {character.titles ? character.titles.join(", ") : 'Unknown'} <br />
+                                            <strong>Born:</strong> {character.born ? character.born : 'Unknown'} <br />
+                                            <strong>Words:</strong> {character.words || 'No words known'}
                                         </Card.Text>
-                                        <Button 
-                                            variant="primary" 
-                                            onClick={() => navigate(`/houses/${house.name}`)}
+                                        <Button
+                                            variant="primary"
+                                            onClick={() => navigate(`/characters/${character.name}`)}
                                         >
                                             Details
                                         </Button>
@@ -108,12 +124,32 @@ const HouseList = () => {
                             </Col>
                         ))
                     ) : (
-                        <p>No houses found.</p>
+                        <p>No characters found.</p>
                     )}
+                </Row>
+                
+                <Row className="mt-4">
+                    <Col className="d-flex justify-content-center">
+                        <Button
+                            variant="secondary"
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1 || totalPages === 0}
+                        >
+                            Previous
+                        </Button>
+                        <span className="mx-2">{`Page ${currentPage} of ${totalPages}`}</span>
+                        <Button
+                            variant="secondary"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages || totalPages === 0}
+                        >
+                            Next
+                        </Button>
+                    </Col>
                 </Row>
             </Container>
         </section>
     );
 };
 
-export default HouseList;
+export default CharacterList;

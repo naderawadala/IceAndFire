@@ -127,7 +127,6 @@ export const updateHouse = createAsyncThunk('houses/updateHouse', async ({ name,
             query: `
             mutation {
               updateHouse(name: "${name}", houseDto: {
-                name: "${updatedHouse.name}",
                 ancestralWeapons: ${JSON.stringify(updatedHouse.ancestralWeapons)},
                 cadetBranches: ${JSON.stringify(updatedHouse.cadetBranches)},
                 coatOfArms: "${updatedHouse.coatOfArms}",
@@ -136,6 +135,7 @@ export const updateHouse = createAsyncThunk('houses/updateHouse', async ({ name,
                 founded: "${updatedHouse.founded}",
                 founder: "${updatedHouse.founder}",
                 heir: "${updatedHouse.heir}",
+                name: "${updatedHouse.name}",
                 overlord: "${updatedHouse.overlord}",
                 region: "${updatedHouse.region}",
                 seats: ${JSON.stringify(updatedHouse.seats)},
@@ -190,10 +190,15 @@ const housesSlice = createSlice({
         items: [],
         status: 'idle',
         error: null,
+        currentPage: 1,
+        housesPerPage: 6, 
     },
     reducers: {
         clearHouse(state) {
             state.house = null;
+        },
+        setCurrentPage(state, action) {
+            state.currentPage = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -203,7 +208,7 @@ const housesSlice = createSlice({
             })
             .addCase(fetchHouses.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.items = action.payload;
+                state.items = action.payload; 
             })
             .addCase(fetchHouses.rejected, (state, action) => {
                 state.status = 'failed';
@@ -249,6 +254,16 @@ const housesSlice = createSlice({
     },
 });
 
-export const { clearHouse } = housesSlice.actions;
+export const { clearHouse, setCurrentPage } = housesSlice.actions;
+
+export const selectHouses = (state) => {
+    const { items, currentPage, housesPerPage } = state.houses;
+    const startIndex = (currentPage - 1) * housesPerPage;
+    return items.slice(startIndex, startIndex + housesPerPage);
+};
+
+export const selectTotalPages = (state) => {
+    return Math.ceil(state.houses.items.length / state.houses.housesPerPage);
+};
 
 export default housesSlice.reducer;

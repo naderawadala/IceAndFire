@@ -151,7 +151,7 @@ namespace IceAndFire.Application.Services
 
         private async Task<IEnumerable<House>> FetchHousesFromApiAsync()
         {
-            var response = await _httpClient.GetStringAsync(_apiUrl);
+            var response = await _httpClient.GetStringAsync($"{_apiUrl}/?pageSize=50");
             var houseDtos = JsonSerializer.Deserialize<List<House>>(response, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase

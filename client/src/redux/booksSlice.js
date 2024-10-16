@@ -195,10 +195,15 @@ const booksSlice = createSlice({
         status: 'idle',
         error: null,
         book: null,
+        currentPage: 1,     
+        booksPerPage: 6,   
     },
     reducers: {
         clearBook(state) {
             state.book = null;
+        },
+        setCurrentPage(state, action) {
+            state.currentPage = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -240,6 +245,16 @@ const booksSlice = createSlice({
     },
 });
 
-export const { clearBook } = booksSlice.actions;
+export const { clearBook, setCurrentPage } = booksSlice.actions;
+
+export const selectBooks = (state) => {
+    const { items, currentPage, booksPerPage } = state.books;
+    const startIndex = (currentPage - 1) * booksPerPage;
+    return items.slice(startIndex, startIndex + booksPerPage);
+};
+
+export const selectTotalPages = (state) => {
+    return Math.ceil(state.books.items.length / state.books.booksPerPage);
+};
 
 export default booksSlice.reducer;

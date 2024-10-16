@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Button, Form, InputGroup, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBooks } from '../redux/booksSlice';
+import { fetchBooks, setCurrentPage } from '../redux/booksSlice';
 
 const BookList = () => {
     const dispatch = useDispatch();
@@ -10,6 +10,8 @@ const BookList = () => {
     const books = useSelector((state) => state.books.items) || [];
     const bookStatus = useSelector((state) => state.books.status);
     const error = useSelector((state) => state.books.error);
+    const currentPage = useSelector((state) => state.books.currentPage);
+    const booksPerPage = useSelector((state) => state.books.booksPerPage);
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -18,6 +20,12 @@ const BookList = () => {
             dispatch(fetchBooks());
         }
     }, [bookStatus, dispatch]);
+
+    useEffect(() => {
+        if (searchTerm) {
+            dispatch(setCurrentPage(1));
+        }
+    }, [searchTerm, dispatch]);
 
     if (bookStatus === 'loading') {
         return <p>Loading books...</p>;
@@ -31,9 +39,20 @@ const BookList = () => {
         const searchTermLower = searchTerm.toLowerCase();
         const bookName = book.name.toLowerCase();
         const bookAuthors = book.authors ? book.authors.join(', ').toLowerCase() : '';
-
         return bookName.includes(searchTermLower) || bookAuthors.includes(searchTermLower);
     });
+
+
+    const totalCount = filteredBooks.length; 
+    const totalPages = Math.ceil(totalCount / booksPerPage); 
+    const startIndex = (currentPage - 1) * booksPerPage; 
+    const currentBooks = filteredBooks.slice(startIndex, startIndex + booksPerPage);
+
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= totalPages) {
+            dispatch(setCurrentPage(page));
+        }
+    };
 
     return (
         <section className="mt-5">
@@ -81,8 +100,8 @@ const BookList = () => {
                 </Row>
 
                 <Row className="g-4">
-                    {filteredBooks.length > 0 ? (
-                        filteredBooks.map((book) => (
+                    {currentBooks.length > 0 ? (
+                        currentBooks.map((book) => (
                             <Col xs={12} sm={6} md={4} lg={3} key={book.isbn}>
                                 <Card className="shadow-sm border-light h-100">
                                     <Card.Body className="d-flex flex-column">
@@ -111,6 +130,26 @@ const BookList = () => {
                     ) : (
                         <p>No books found.</p>
                     )}
+                </Row>
+
+                <Row className="mt-4">
+                    <Col className="d-flex justify-content-center">
+                        <Button
+                            variant="secondary"
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1 || totalCount === 0}
+                        >
+                            Previous
+                        </Button>
+                        <span className="mx-2">{`Page ${currentPage} of ${totalPages || 1}`}</span>
+                        <Button
+                            variant="secondary"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages || totalCount === 0}
+                        >
+                            Next
+                        </Button>
+                    </Col>
                 </Row>
             </Container>
         </section>
