@@ -39,6 +39,7 @@ services:
       - MONGO_INITDB_DATABASE=IceAndFireDB
     volumes:
       - mongo_data:/data/db          
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js 
     networks:
       - backend_network
 

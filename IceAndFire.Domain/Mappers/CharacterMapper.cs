@@ -38,13 +38,13 @@ namespace IceAndFire.Domain.Mappers
             };
         }
 
-        public static Character MapToEntity(CharacterDto dto)
+        public static Character MapToEntity(CharacterDto dto, string Id = null)
         {
             if (dto == null) return null;
 
             return new Character
             {
-                Id = Regex.Match(dto.Url, @"/(\d+)").Groups[1].Value,
+                Id = string.IsNullOrEmpty(Id) ? ObjectId.GenerateNewId().ToString() : Id,
                 Url = dto.Url,
                 Name = dto.Name,
                 Gender = dto.Gender,
