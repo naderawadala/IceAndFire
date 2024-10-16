@@ -1,4 +1,4 @@
-using AppAny.HotChocolate.FluentValidation;
+﻿using AppAny.HotChocolate.FluentValidation;
 using FluentValidation.AspNetCore;
 using IceAndFire.Application.Mutations;
 using IceAndFire.Application.Queries;

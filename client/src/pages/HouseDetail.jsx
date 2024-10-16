@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Accordion, Spinner, Button, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchHouseByName, deleteHouse } from '../redux/housesSlice'; // Import the deleteHouse action
+import { fetchHouseByName, deleteHouse } from '../redux/housesSlice';
 
 const HouseDetail = () => {
     const { name } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // Select house and status from Redux store
     const house = useSelector((state) => state.houses.house);
     const loading = useSelector((state) => state.houses.status === 'loading');
     const error = useSelector((state) => state.houses.error);
@@ -21,17 +20,15 @@ const HouseDetail = () => {
     }, [dispatch, name]);
 
     const handleDelete = async () => {
-        // Dispatch the deleteHouse action
         try {
-            await dispatch(deleteHouse(house.name)).unwrap(); // Using unwrap to handle potential errors
-            navigate('/houses'); // Navigate back to the house list after deletion
+            await dispatch(deleteHouse(house.name)).unwrap();
+            navigate('/houses');
         } catch (error) {
-            console.error('Delete error:', error.message); // Handle error if needed
         }
     };
 
     const handleUpdate = () => {
-        navigate(`/update-house/${house.name}`, { state: house }); // Pass house data to HouseForm
+        navigate(`/update-house/${house.name}`, { state: house });
     };
 
     if (loading) {
@@ -43,21 +40,19 @@ const HouseDetail = () => {
     }
 
     if (!house) {
-        return <p>No house found!</p>; // Handle case where no house is found
+        return <p>No house found!</p>;
     }
 
     return (
         <div className="mt-5 container" style={{ maxWidth: '800px', margin: '0 auto' }}>
-            {/* Go Back Button */}
             <Button 
                 variant="outline-secondary" 
-                onClick={() => navigate('/houses')} // Navigate to the house list
+                onClick={() => navigate('/houses')} 
                 className="mb-4" 
-                style={{ padding: '0.375rem 1rem' }} // Maintain consistent padding
+                style={{ padding: '0.375rem 1rem' }}
             >
                 <i className="bi bi-arrow-left"></i> Go Back
             </Button>
-            
             <h2>{house.name}</h2>
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <div>
@@ -149,7 +144,6 @@ const HouseDetail = () => {
                 </Accordion.Item>
             </Accordion>
 
-            {/* Delete Confirmation Modal */}
             <Modal show={showConfirmDelete} onHide={() => setShowConfirmDelete(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Delete</Modal.Title>

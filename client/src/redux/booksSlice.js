@@ -1,7 +1,5 @@
-// src/store/booksSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// Fetch all books
 export const fetchBooks = createAsyncThunk('books/fetchBooks', async () => {
     const query = `
         query {
@@ -38,7 +36,6 @@ export const fetchBooks = createAsyncThunk('books/fetchBooks', async () => {
     return data.data.books;
 });
 
-// Fetch a book by name
 export const fetchBookByName = createAsyncThunk('books/fetchBookByName', async (name) => {
     const query = `
         query {
@@ -75,7 +72,6 @@ export const fetchBookByName = createAsyncThunk('books/fetchBookByName', async (
     return data.data.bookByName;
 });
 
-// Create a new book
 export const createBook = createAsyncThunk('books/createBook', async (bookData) => {
     const query = `
         mutation {
@@ -119,12 +115,10 @@ export const createBook = createAsyncThunk('books/createBook', async (bookData) 
         throw new Error(data.errors.map(err => err.message).join(', '));
     }
 
-    return data.data.createBook; // Return created book's ID or other info if needed
+    return data.data.createBook;
 });
 
-// Update an existing book
 export const updateBook = createAsyncThunk('books/updateBook', async ({ isbn, bookData }) => {
-    console.log("Inside updateBook thunk", isbn, bookData);
     const query = `
         mutation {
              updateBook(isbn:"${isbn}", bookDto: {
@@ -162,16 +156,14 @@ export const updateBook = createAsyncThunk('books/updateBook', async ({ isbn, bo
     });
 
     const data = await response.json();
-    console.log('Update Response:', data);
 
     if (data.errors) {
         throw new Error(data.errors.map(err => err.message).join(', '));
     }
 
-    return data.data.updateBook; // Return updated book's ID or other info if needed
+    return data.data.updateBook;
 });
 
-// Delete a book
 export const deleteBook = createAsyncThunk('books/deleteBook', async (isbn) => {
     const query = `
         mutation {
@@ -193,7 +185,7 @@ export const deleteBook = createAsyncThunk('books/deleteBook', async (isbn) => {
         throw new Error(data.errors.map(err => err.message).join(', '));
     }
 
-    return isbn; // Return the ISBN of the deleted book for removal from the state
+    return isbn;
 });
 
 const booksSlice = createSlice({
@@ -202,7 +194,7 @@ const booksSlice = createSlice({
         items: [],
         status: 'idle',
         error: null,
-        book: null, // To store fetched book data when editing
+        book: null,
     },
     reducers: {
         clearBook(state) {
@@ -234,16 +226,16 @@ const booksSlice = createSlice({
                 state.error = action.error.message;
             })
             .addCase(createBook.fulfilled, (state, action) => {
-                state.items.push(action.payload); // Add new book to the list
+                state.items.push(action.payload);
             })
             .addCase(updateBook.fulfilled, (state, action) => {
                 const index = state.items.findIndex(book => book.isbn === action.payload.isbn);
                 if (index !== -1) {
-                    state.items[index] = action.payload; // Update the existing book
+                    state.items[index] = action.payload;
                 }
             })
             .addCase(deleteBook.fulfilled, (state, action) => {
-                state.items = state.items.filter(book => book.isbn !== action.payload); // Remove the deleted book
+                state.items = state.items.filter(book => book.isbn !== action.payload);
             });
     },
 });

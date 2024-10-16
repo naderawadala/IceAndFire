@@ -96,10 +96,10 @@ const BookForm = () => {
         setSubmitting(false);
     };
 
-    // Go Back button handler
+
     const handleGoBack = () => {
-        dispatch(clearBook()); // Clear the book state
-        navigate('/books'); // Navigate back to the books list
+        dispatch(clearBook()); 
+        navigate('/books'); 
     };
 
     if (status === 'loading') {
@@ -111,7 +111,7 @@ const BookForm = () => {
             <h2>{isEditMode ? 'Update Book' : 'Create Book'}</h2>
             <Button 
                 variant="outline-secondary" 
-                onClick={handleGoBack} // Call handleGoBack on click
+                onClick={handleGoBack}
                 className="mb-3"
             >
                 <i className="bi bi-arrow-left"></i> Go Back

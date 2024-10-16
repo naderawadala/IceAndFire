@@ -1,7 +1,5 @@
-// src/store/housesSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// Fetch all houses
 export const fetchHouses = createAsyncThunk('houses/fetchHouses', async () => {
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
@@ -36,9 +34,7 @@ export const fetchHouses = createAsyncThunk('houses/fetchHouses', async () => {
     return data.data.houses;
 });
 
-// Fetch a house by name
 export const fetchHouseByName = createAsyncThunk('houses/fetchHouseByName', async (name) => {
-    console.log(name)
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
         headers: {
@@ -69,11 +65,9 @@ export const fetchHouseByName = createAsyncThunk('houses/fetchHouseByName', asyn
         }),
     });
     const data = await response.json();
-    console.log(data);
     return data.data.houseByName;
 });
 
-// Create a new house
 export const createHouse = createAsyncThunk('houses/createHouse', async (newHouse) => {
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
@@ -123,7 +117,6 @@ export const createHouse = createAsyncThunk('houses/createHouse', async (newHous
     return data.data.createHouse;
 });
 
-// Update an existing house
 export const updateHouse = createAsyncThunk('houses/updateHouse', async ({ name, updatedHouse }) => {
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
@@ -134,7 +127,7 @@ export const updateHouse = createAsyncThunk('houses/updateHouse', async ({ name,
             query: `
             mutation {
               updateHouse(name: "${name}", houseDto: {
-                name: "${updatedHouse.name}"
+                name: "${updatedHouse.name}",
                 ancestralWeapons: ${JSON.stringify(updatedHouse.ancestralWeapons)},
                 cadetBranches: ${JSON.stringify(updatedHouse.cadetBranches)},
                 coatOfArms: "${updatedHouse.coatOfArms}",
@@ -173,7 +166,6 @@ export const updateHouse = createAsyncThunk('houses/updateHouse', async ({ name,
     return data.data.updateHouse;
 });
 
-// Delete a house
 export const deleteHouse = createAsyncThunk('houses/deleteHouse', async (name) => {
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
@@ -189,7 +181,7 @@ export const deleteHouse = createAsyncThunk('houses/deleteHouse', async (name) =
         }),
     });
     const data = await response.json();
-    return name; // Return the ID of the deleted house
+    return name;
 });
 
 const housesSlice = createSlice({
@@ -206,7 +198,6 @@ const housesSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // Fetch houses
             .addCase(fetchHouses.pending, (state) => {
                 state.status = 'loading';
             })
@@ -218,21 +209,17 @@ const housesSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.error.message;
             })
-            
-            // Fetch house by name
             .addCase(fetchHouseByName.pending, (state) => {
                 state.status = 'loading';
             })
             .addCase(fetchHouseByName.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.house = action.payload; // Store the fetched house
+                state.house = action.payload;
             })
             .addCase(fetchHouseByName.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             })
-            
-            // Update house
             .addCase(updateHouse.pending, (state) => {
                 state.status = 'loading';
             })
@@ -248,8 +235,6 @@ const housesSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.error.message;
             })
-            
-            // Delete house
             .addCase(deleteHouse.pending, (state) => {
                 state.status = 'loading';
             })

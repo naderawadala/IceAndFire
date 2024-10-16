@@ -2,14 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Accordion, Spinner, Button, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBookByName, deleteBook } from '../redux/booksSlice'; // Import the deleteBook action
+import { fetchBookByName, deleteBook } from '../redux/booksSlice';
 
 const BookDetail = () => {
     const { name } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    // Select book and status from Redux store
     const book = useSelector((state) => state.books.book);
     const loading = useSelector((state) => state.books.status === 'loading');
     const error = useSelector((state) => state.books.error);
@@ -21,17 +19,16 @@ const BookDetail = () => {
     }, [dispatch, name]);
 
     const handleDelete = async () => {
-        // Dispatch the deleteBook action
         try {
-            await dispatch(deleteBook(book.isbn)).unwrap(); // Using unwrap to handle potential errors
-            navigate('/books'); // Navigate back to the book list after deletion
+            await dispatch(deleteBook(book.isbn)).unwrap();
+            navigate('/books');
         } catch (error) {
-            console.error('Delete error:', error.message); // Handle error if needed
+            console.error('Delete error:', error.message);
         }
     };
 
     const handleUpdate = () => {
-        navigate(`/update-book/${book.name}`, { state: book }); // Pass book data to BookForm
+        navigate(`/update-book/${book.name}`, { state: book });
     };
     
     if (loading) {
@@ -43,16 +40,16 @@ const BookDetail = () => {
     }
 
     if (!book) {
-        return <p>No book found!</p>; // Handle case where no book is found
+        return <p>No book found!</p>;
     }
 
     return (
         <div className="mt-5 container" style={{ maxWidth: '800px', margin: '0 auto' }}>
             <Button 
                 variant="outline-secondary" 
-                onClick={() => navigate('/books')} // Navigate to the book list
+                onClick={() => navigate('/books')} 
                 className="mb-4" 
-                style={{ padding: '0.375rem 1rem' }} // Maintain consistent padding
+                style={{ padding: '0.375rem 1rem' }}
             >
                 <i className="bi bi-arrow-left"></i> Go Back
             </Button>
@@ -104,7 +101,6 @@ const BookDetail = () => {
                 </Accordion.Item>
             </Accordion>
 
-            {/* Delete Confirmation Modal */}
             <Modal show={showConfirmDelete} onHide={() => setShowConfirmDelete(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Delete</Modal.Title>

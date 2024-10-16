@@ -1,4 +1,3 @@
-// src/store/index.js
 import { configureStore } from '@reduxjs/toolkit';
 import booksReducer from './booksSlice';
 import charactersReducer from './charactersSlice';

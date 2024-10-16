@@ -10,10 +10,9 @@ const Main = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // Fetch books, characters, and houses
-    const books = useSelector((state) => state.books.items.slice(0, 5)) || []; // Get first 5 books
-    const characters = useSelector((state) => state.characters.items.slice(0, 5)) || []; // Get first 5 characters
-    const houses = useSelector((state) => state.houses.items.slice(0, 5)) || []; // Get first 5 houses
+    const books = useSelector((state) => state.books.items.slice(0, 5)) || [];
+    const characters = useSelector((state) => state.characters.items.slice(0, 5)) || [];
+    const houses = useSelector((state) => state.houses.items.slice(0, 5)) || [];
 
     useEffect(() => {
         dispatch(fetchBooks());

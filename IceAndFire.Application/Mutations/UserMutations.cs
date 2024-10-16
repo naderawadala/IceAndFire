@@ -37,10 +37,8 @@ namespace IceAndFire.Application.Mutations
         [GraphQLDescription("Log in a user and return a JWT token and user role.")]
         public async Task<LoginResponseDto> Login(LoginDto loginDto)
         {
-            // Call the service method and get the response
             var loginResponse = await _service.LoginAsync(loginDto);
 
-            // Return the login response which includes the token and role
             return loginResponse;
         }
 

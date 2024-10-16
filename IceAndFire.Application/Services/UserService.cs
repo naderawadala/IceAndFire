@@ -1,4 +1,4 @@
-using IceAndFire.Domain.DTO;
+﻿using IceAndFire.Domain.DTO;
 using IceAndFire.Domain.Entities;
 using IceAndFire.Domain.Mappers;
 using IceAndFire.Infrastructure.Persistence;
@@ -34,7 +34,6 @@ namespace IceAndFire.Application.Services
         {
             Console.WriteLine("Reach first?");
 
-            // Check if the username already exists
             var existingUser = await _context.Users
                 .Find(u => u.Username == userDto.Username)
                 .FirstOrDefaultAsync();
@@ -46,24 +45,21 @@ namespace IceAndFire.Application.Services
 
             Console.WriteLine("Reach here");
 
-            // Hash the password
             userDto.Password = _passwordHasher.HashPassword(userDto.Password);
             var user = UserMapper.MapToEntity(userDto);
 
-            // Check if this is the first user
             var userCount = await _context.Users.CountDocumentsAsync(new BsonDocument());
             if (userCount == 0)
             {
-                user.Role = "Admin"; // First user becomes admin
+                user.Role = "Admin"; 
             }
             else
             {
-                user.Role = "User"; // Subsequent users are regular users
+                user.Role = "User"; 
             }
 
             Console.WriteLine("Reached here");
 
-            // Insert the new user into the database
             await _context.Users.InsertOneAsync(user);
 
             return user;
@@ -86,7 +82,6 @@ namespace IceAndFire.Application.Services
 
             await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user);
 
-            var token = GenerateToken(user);
 
             return new LoginResponseDto
             {
@@ -146,7 +141,6 @@ namespace IceAndFire.Application.Services
                 Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
             }
 
-            // Retrieve the 'sub' claim
             var usernameClaim = principal.FindFirst("subject");
             if (usernameClaim == null)
             {
@@ -154,7 +148,7 @@ namespace IceAndFire.Application.Services
                 throw new SecurityTokenException("Invalid token.");
             }
 
-            var username = usernameClaim.Value; // Get the username from the sub claim
+            var username = usernameClaim.Value;
             Console.WriteLine($"principal username: {username}");
 
             var user = await _context.Users.Find(u => u.Username == username).FirstOrDefaultAsync();
@@ -190,14 +184,13 @@ namespace IceAndFire.Application.Services
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(ConvertHexStringToByteArray(_config["Jwt:Key"])),
-                ValidateLifetime = false // Allow expired tokens for refresh
+                ValidateLifetime = false
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
             var jwtSecurityToken = securityToken as JwtSecurityToken;
 
-            // Log claims for debugging
             if (jwtSecurityToken != null)
             {
                 Console.WriteLine("Claims in validated token:");

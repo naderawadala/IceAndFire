@@ -1,7 +1,5 @@
-// src/store/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// Async thunk for registering a new user
 export const registerUser = createAsyncThunk('auth/registerUser', async (userData) => {
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
@@ -31,10 +29,9 @@ export const registerUser = createAsyncThunk('auth/registerUser', async (userDat
         throw new Error(data.errors.map(err => err.message).join(', '));
     }
 
-    return data.data.register; // Return the user data upon registration
+    return data.data.register;
 });
 
-// Async thunk for logging in a user
 export const loginUser = createAsyncThunk('auth/loginUser', async (userData) => {
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
@@ -58,30 +55,25 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (userData) => 
 
     const data = await response.json();
 
-    console.log(data)
-
     if (data.errors) {
         throw new Error(data.errors.map(err => err.message).join(', '));
     }
 
-    // Get both token and role upon successful login
     const { token, role } = data.data.login;
 
-    return { token, role }; // Return both token and role
+    return { token, role };
 });
 
-// Async thunk for logging out the user
 export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
-    // Perform any necessary logout operations, like clearing local storage
-    localStorage.removeItem('token'); // Clear token from local storage
-    return null; // Return null to indicate logout
+    localStorage.removeItem('token');
+    return null;
 });
 
 const initialState = {
     user: null,
     token: null,
     isAuthenticated: false,
-    role: null, // Role is included in the initial state
+    role: null,
 };
 
 const authSlice = createSlice({
@@ -91,21 +83,21 @@ const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(registerUser.fulfilled, (state, action) => {
-                state.user = action.payload; // Set user data upon registration
-                state.isAuthenticated = true; // Mark user as authenticated
-                state.role = action.payload.role; // Store user role
+                state.user = action.payload;
+                state.isAuthenticated = true;
+                state.role = action.payload.role;
             })
             .addCase(loginUser.fulfilled, (state, action) => {
-                state.token = action.payload.token; // Set the token returned from login
-                state.isAuthenticated = true; // Update authentication status
-                state.user = { role: action.payload.role }; // Create user object with role
-                state.role = action.payload.role; // Store user role
+                state.token = action.payload.token;
+                state.isAuthenticated = true;
+                state.user = { role: action.payload.role };
+                state.role = action.payload.role;
             })
             .addCase(logoutUser.fulfilled, (state) => {
-                state.user = null; // Clear user information
-                state.token = null; // Clear token
-                state.isAuthenticated = false; // Update authentication status
-                state.role = null; // Clear user role
+                state.user = null;
+                state.token = null;
+                state.isAuthenticated = false;
+                state.role = null;
             });
     },
 });

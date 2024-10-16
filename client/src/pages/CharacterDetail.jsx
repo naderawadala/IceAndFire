@@ -2,23 +2,21 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Card, Spinner, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCharacterByName } from '../redux/charactersSlice'; // Import the fetch action
+import { fetchCharacterByName } from '../redux/charactersSlice';
 
 const CharacterDetail = () => {
     const { name } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // Select character and status from Redux store
     const character = useSelector((state) => state.characters.character);
     const loading = useSelector((state) => state.characters.status === 'loading');
     const error = useSelector((state) => state.characters.error);
 
     useEffect(() => {
-        dispatch(fetchCharacterByName(name)); // Fetch character details by name
+        dispatch(fetchCharacterByName(name));
     }, [dispatch, name]);
 
-    // Handle loading and error states
     if (loading) {
         return <Spinner animation="border" />;
     }
@@ -28,16 +26,16 @@ const CharacterDetail = () => {
     }
 
     if (!character) {
-        return <p>No character found!</p>; // Handle case where no character is found
+        return <p>No character found!</p>;
     }
 
     return (
         <Container className="my-4">
             <Button 
                 variant="outline-secondary" 
-                onClick={() => navigate('/characters')} // Navigate to the character list
+                onClick={() => navigate('/characters')} 
                 className="mb-4" 
-                style={{ padding: '0.375rem 1rem' }} // Maintain consistent padding
+                style={{ padding: '0.375rem 1rem' }}
             >
                 <i className="bi bi-arrow-left"></i> Go Back
             </Button>

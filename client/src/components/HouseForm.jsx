@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { fetchHouseByName, createHouse, updateHouse, clearHouse, fetchHouses } from '../redux/housesSlice';
-import houseValidationSchema from '../validation/houseValidationSchema'; // Assuming validation schema exists
+import houseValidationSchema from '../validation/houseValidationSchema';
 
 const HouseForm = () => {
     const { name } = useParams();
@@ -88,7 +88,6 @@ const HouseForm = () => {
     }, [house]);
 
     const handleBack = () => {
-        // Navigate back and clear form data
         setInitialFormData({
             name: '',
             region: '',
@@ -106,7 +105,7 @@ const HouseForm = () => {
             cadetBranches: '',
             swornMembers: '',
         });
-        navigate('/houses'); // Navigate to the houses list page
+        navigate('/houses'); 
     };
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {

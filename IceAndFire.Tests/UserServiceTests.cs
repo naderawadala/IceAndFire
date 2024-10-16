@@ -37,11 +37,9 @@ namespace IceAndFire.Tests
         {
             var userDto = new UserDto { Username = "uniqueUser", Password = "ValidPassword123!" };
 
-            // Setup the Find method to return an empty result
             _userCollectionMock.Setup(m => m.Find(It.IsAny<FilterDefinition<User>>(), null))
                 .Returns(Mock.Of<IFindFluent<User, User>>());
 
-            // Ensure that the returned FindFluent can be set up to return null
             var findFluentMock = new Mock<IFindFluent<User, User>>();
             findFluentMock.Setup(m => m.FirstOrDefaultAsync(default)).ReturnsAsync((User)null);
 
@@ -64,7 +62,6 @@ namespace IceAndFire.Tests
             var userDto = new UserDto { Username = "existingUser", Password = "ValidPassword123!" };
             var existingUser = new User { Username = "existingUser" };
 
-            // Setup the Find method to return an existing user
             var findFluentMock = new Mock<IFindFluent<User, User>>();
             findFluentMock.Setup(m => m.FirstOrDefaultAsync(default)).ReturnsAsync(existingUser);
 

@@ -1,7 +1,5 @@
-// src/redux/charactersSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// Fetch all characters
 export const fetchCharacters = createAsyncThunk('characters/fetchCharacters', async () => {
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
@@ -33,10 +31,9 @@ export const fetchCharacters = createAsyncThunk('characters/fetchCharacters', as
         }),
     });
     const data = await response.json();
-    return data.data.characters; // Return all characters
+    return data.data.characters;
 });
 
-// Fetch character by ID
 export const fetchCharacterByName = createAsyncThunk('characters/fetchCharacterByName', async (name) => {
     const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
@@ -67,11 +64,9 @@ export const fetchCharacterByName = createAsyncThunk('characters/fetchCharacterB
         }),
     });
     const data = await response.json();
-    console.log(data)
-    return data.data.characterByName; // Return the character by name
+    return data.data.characterByName;
 });
 
-// Character slice setup (initial state and reducers)
 const charactersSlice = createSlice({
     name: 'characters',
     initialState: {
@@ -88,7 +83,7 @@ const charactersSlice = createSlice({
             })
             .addCase(fetchCharacters.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.items = action.payload; // Store fetched characters
+                state.items = action.payload;
             })
             .addCase(fetchCharacters.rejected, (state, action) => {
                 state.status = 'failed';
@@ -99,7 +94,7 @@ const charactersSlice = createSlice({
             })
             .addCase(fetchCharacterByName.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.character = action.payload; // Store fetched character by ID
+                state.character = action.payload;
             })
             .addCase(fetchCharacterByName.rejected, (state, action) => {
                 state.status = 'failed';

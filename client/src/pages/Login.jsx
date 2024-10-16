@@ -1,9 +1,8 @@
-// Login.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { loginUser } from '../redux/authSlice'; // Import your redux action
-import { Button, Form } from 'react-bootstrap'; // Using React Bootstrap for styling
+import { loginUser } from '../redux/authSlice';
+import { Button, Form } from 'react-bootstrap';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -15,12 +14,8 @@ const Login = () => {
         e.preventDefault();
         try {
             const token = await dispatch(loginUser({ username, password })).unwrap();
-            // Store the token in local storage for further requests
-            console.log(token.token)
             localStorage.setItem('token', token.token);
-            //window.location.reload(); // Full page refresh
         } catch (error) {
-            console.error('Login failed:', error);
         }
     };
 

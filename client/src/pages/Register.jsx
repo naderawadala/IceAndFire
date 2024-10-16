@@ -1,9 +1,8 @@
-// Register.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../redux/authSlice'; // Import your redux action
+import { registerUser } from '../redux/authSlice';
 import { useDispatch } from 'react-redux';
-import { Button, Form } from 'react-bootstrap'; // Using React Bootstrap for styling
+import { Button, Form } from 'react-bootstrap';
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -15,9 +14,8 @@ const Register = () => {
         e.preventDefault();
         try {
             await dispatch(registerUser({ username, password })).unwrap();
-            navigate('/'); // Redirect to login after successful registration
+            navigate('/');
         } catch (error) {
-            console.error('Registration failed:', error);
         }
     };
 

@@ -56,11 +56,9 @@ namespace IceAndFire.Application.Services
                 throw;
             }
 
-            // Check if any characters were found
             if (charactersFromDb != null && charactersFromDb.Count > 0)
             {
                 Console.WriteLine("Characters successfully fetched from MongoDB.");
-                // Optionally cache the data
                 //_redisCache.Set(cacheKey, JsonSerializer.Serialize(charactersFromDb), TimeSpan.FromMinutes(10));
                 return charactersFromDb;
             }
