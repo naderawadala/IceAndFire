@@ -19,7 +19,6 @@ namespace IceAndFire.Domain.Mappers
 
             return new CharacterDto
             {
-                Url = character.Url,
                 Name = character.Name,
                 Gender = character.Gender,
                 Culture = character.Culture,
@@ -38,14 +37,13 @@ namespace IceAndFire.Domain.Mappers
             };
         }
 
-        public static Character MapToEntity(CharacterDto dto)
+        public static Character MapToEntity(CharacterDto dto, string Id = null)
         {
             if (dto == null) return null;
 
             return new Character
             {
-                Id = Regex.Match(dto.Url, @"/(\d+)").Groups[1].Value,
-                Url = dto.Url,
+                Id = string.IsNullOrEmpty(Id) ? ObjectId.GenerateNewId().ToString() : Id,
                 Name = dto.Name,
                 Gender = dto.Gender,
                 Culture = dto.Culture,

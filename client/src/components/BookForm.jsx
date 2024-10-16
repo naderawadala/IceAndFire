@@ -5,8 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { fetchBookByName, createBook, updateBook, clearBook, fetchBooks } from '../redux/booksSlice';
-
-import  bookValidationSchema from '../validation/bookValidationSchema';
+import bookValidationSchema from '../validation/bookValidationSchema';
 
 const BookForm = () => {
     const { name } = useParams();
@@ -33,7 +32,6 @@ const BookForm = () => {
     useEffect(() => {
         if (isEditMode) {
             if (location.state) {
-                // If the book is passed from the previous location state
                 const bookFromState = location.state;
                 setInitialFormData({
                     name: bookFromState.name,
@@ -48,7 +46,6 @@ const BookForm = () => {
                     povCharacters: bookFromState.povCharacters.join(', '),
                 });
             } else {
-                // Fetch book if not available in location state
                 dispatch(fetchBookByName(name));
             }
         }
@@ -60,7 +57,6 @@ const BookForm = () => {
 
     useEffect(() => {
         if (book) {
-            // If book is fetched from the Redux state
             setInitialFormData({
                 name: book.name,
                 isbn: book.isbn,
@@ -76,11 +72,9 @@ const BookForm = () => {
         }
     }, [book]);
 
-
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         const payload = {
             ...values,
-            // Ensure these are always arrays of strings
             authors: values.authors.split(',').map(author => author.trim()).filter(Boolean),
             characters: values.characters.split(',').map(character => character.trim()).filter(Boolean),
             povCharacters: values.povCharacters.split(',').map(povCharacter => povCharacter.trim()).filter(Boolean),
@@ -88,8 +82,6 @@ const BookForm = () => {
         };
 
         if (isEditMode) {
-            console.log("reached dispatch update book?")
-            console.log(payload)
             await dispatch(updateBook({ isbn: book.isbn, bookData: payload }));
         } else {
             await dispatch(createBook(payload));
@@ -97,12 +89,17 @@ const BookForm = () => {
 
         if (!error) {
             dispatch(fetchBooks());
-        
             resetForm();
             dispatch(clearBook());
             navigate('/books');
         }
         setSubmitting(false);
+    };
+
+    // Go Back button handler
+    const handleGoBack = () => {
+        dispatch(clearBook()); // Clear the book state
+        navigate('/books'); // Navigate back to the books list
     };
 
     if (status === 'loading') {
@@ -112,6 +109,13 @@ const BookForm = () => {
     return (
         <div className="mt-5 container" style={{ maxWidth: '800px' }}>
             <h2>{isEditMode ? 'Update Book' : 'Create Book'}</h2>
+            <Button 
+                variant="outline-secondary" 
+                onClick={handleGoBack} // Call handleGoBack on click
+                className="mb-3"
+            >
+                <i className="bi bi-arrow-left"></i> Go Back
+            </Button>
             <Formik
                 initialValues={initialFormData}
                 validationSchema={bookValidationSchema}

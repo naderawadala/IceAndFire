@@ -1,24 +1,25 @@
-import React from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBooks } from '../redux/booksSlice';
+import { fetchCharacters } from '../redux/charactersSlice';
+import { fetchHouses } from '../redux/housesSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Main = () => {
-    const books = [
-        { title: "A Game of Thrones", description: "The first book in the series, setting the stage for the epic conflict of the realm." },
-        { title: "A Clash of Kings", description: "The second book that delves deeper into the politics and battles for the throne." },
-        { title: "A Storm of Swords", description: "The third installment that escalates the tension and war in Westeros." },
-    ];
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const characters = [
-        { name: "Jon Snow", description: "The illegitimate son of Eddard Stark, raised in Winterfell." },
-        { name: "Daenerys Targaryen", description: "The last surviving member of the Targaryen dynasty." },
-        { name: "Tyrion Lannister", description: "A witty and intelligent member of House Lannister." },
-    ];
+    // Fetch books, characters, and houses
+    const books = useSelector((state) => state.books.items.slice(0, 5)) || []; // Get first 5 books
+    const characters = useSelector((state) => state.characters.items.slice(0, 5)) || []; // Get first 5 characters
+    const houses = useSelector((state) => state.houses.items.slice(0, 5)) || []; // Get first 5 houses
 
-    const houses = [
-        { name: "House Stark", description: "The noble house of Winterfell, known for their honor." },
-        { name: "House Lannister", description: "The wealthy house from Casterly Rock, known for their gold." },
-        { name: "House Targaryen", description: "The house known for their dragons and claim to the Iron Throne." },
-    ];
+    useEffect(() => {
+        dispatch(fetchBooks());
+        dispatch(fetchCharacters());
+        dispatch(fetchHouses());
+    }, [dispatch]);
 
     return (
         <Container className="mt-4">
@@ -51,14 +52,34 @@ const Main = () => {
             </section>
 
             <section className="mt-5">
-                <h2>BOOKS</h2>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h2>BOOKS</h2>
+                    <Button 
+                        variant="outline-primary" 
+                        onClick={() => navigate('/books')} 
+                        className="ml-3"
+                    >
+                        View All
+                    </Button>
+                </div>
                 <Row>
-                    {books.map((book, index) => (
-                        <Col xs={12} md={4} key={index}>
-                            <Card className="mb-4">
+                    {books.map((book) => (
+                        <Col xs={12} md={4} key={book.isbn}>
+                            <Card className="mb-4 shadow-sm border-light">
                                 <Card.Body>
-                                    <Card.Title>{book.title}</Card.Title>
-                                    <Card.Text>{book.description}</Card.Text>
+                                    <Card.Title>{book.name}</Card.Title>
+                                    <Card.Subtitle className="mb-2 text-muted">
+                                        {Array.isArray(book.authors) && book.authors.length > 1 ? "Authors: " : "Author: "}
+                                        {Array.isArray(book.authors) ? book.authors.join(", ") : "Unknown Author"}
+                                    </Card.Subtitle>
+                                    <Card.Text>
+                                        <strong>ISBN:</strong> {book.isbn} <br />
+                                        <strong>Pages:</strong> {book.numberOfPages} <br />
+                                        <strong>Released:</strong> {new Date(book.released).toLocaleDateString()} <br />
+                                    </Card.Text>
+                                    <Button variant="primary" onClick={() => navigate(`/books/${book.name}`)}>
+                                        Details
+                                    </Button>
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -67,14 +88,33 @@ const Main = () => {
             </section>
 
             <section className="mt-5">
-                <h2>CHARACTERS</h2>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h2>CHARACTERS</h2>
+                    <Button 
+                        variant="outline-primary" 
+                        onClick={() => navigate('/characters')} 
+                        className="ml-3"
+                    >
+                        View All
+                    </Button>
+                </div>
                 <Row>
-                    {characters.map((character, index) => (
-                        <Col xs={12} md={4} key={index}>
-                            <Card className="mb-4">
+                    {characters.map((character) => (
+                        <Col xs={12} md={4} key={character.name}>
+                            <Card className="mb-4 shadow-sm border-light">
                                 <Card.Body>
                                     <Card.Title>{character.name}</Card.Title>
-                                    <Card.Text>{character.description}</Card.Text>
+                                    <Card.Subtitle className="mb-2 text-muted">
+                                        {character.titles.length > 0 ? `Titles: ${character.titles.join(", ")}` : 'No Titles'}
+                                    </Card.Subtitle>
+                                    <Card.Text>
+                                        <strong>Culture:</strong> {character.culture || 'Unknown'} <br />
+                                        <strong>Born:</strong> {character.born || 'Unknown'} <br />
+                                        <strong>Died:</strong> {character.died || 'Unknown'}
+                                    </Card.Text>
+                                    <Button variant="primary" onClick={() => navigate(`/characters/${character.name}`)}>
+                                        Details
+                                    </Button>
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -83,14 +123,32 @@ const Main = () => {
             </section>
 
             <section className="mt-5">
-                <h2>HOUSES</h2>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h2>HOUSES</h2>
+                    <Button 
+                        variant="outline-primary" 
+                        onClick={() => navigate('/houses')} 
+                        className="ml-3"
+                    >
+                        View All
+                    </Button>
+                </div>
                 <Row>
-                    {houses.map((house, index) => (
-                        <Col xs={12} md={4} key={index}>
-                            <Card className="mb-4">
+                    {houses.map((house) => (
+                        <Col xs={12} md={4} key={house.name}>
+                            <Card className="mb-4 shadow-sm border-light">
                                 <Card.Body>
                                     <Card.Title>{house.name}</Card.Title>
-                                    <Card.Text>{house.description}</Card.Text>
+                                    <Card.Subtitle className="mb-2 text-muted">
+                                        {house.founder ? `Founder: ${house.founder}` : 'Founder Unknown'}
+                                    </Card.Subtitle>
+                                    <Card.Text>
+                                        <strong>Region:</strong> {house.region} <br />
+                                        <strong>Founded:</strong> {house.founded || 'Unknown'} <br />
+                                    </Card.Text>
+                                    <Button variant="primary" onClick={() => navigate(`/houses/${house.name}`)}>
+                                        Details
+                                    </Button>
                                 </Card.Body>
                             </Card>
                         </Col>

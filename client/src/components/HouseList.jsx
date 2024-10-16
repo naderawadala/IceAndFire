@@ -28,14 +28,31 @@ const HouseList = () => {
 
     return (
         <section className="mt-5">
-            <h2>HOUSES</h2>
+            {/* Go Back Button */}
             <Button 
-                variant="success" 
-                className="mb-3" 
-                onClick={() => navigate('/houses/new')}
+                variant="outline-secondary" 
+                onClick={() => navigate('/')}
+                className="mb-4" 
+                title="Return to Home"
+                style={{ display: 'inline-flex', alignItems: 'center' }}
             >
-                Create House
+                <i className="bi bi-arrow-left me-2"></i> Go Back
             </Button>
+
+            {/* Houses Header and Create House Button */}
+            <div className="d-flex align-items-center mb-3">
+                <h2 className="mb-0 me-2">HOUSES</h2>
+                <Button 
+                    variant="success" 
+                    title="Create House" 
+                    onClick={() => navigate('/houses/new')}
+                    className="btn-sm"
+                >
+                    <i className="bi bi-plus"></i>
+                </Button>
+            </div>
+
+            {/* Houses List */}
             <Row>
                 {houses.map((house) => (
                     <Col xs={12} md={4} key={house.name}>
@@ -43,10 +60,9 @@ const HouseList = () => {
                             <Card.Body>
                                 <Card.Title>{house.name}</Card.Title>
                                 <Card.Subtitle className="mb-2 text-muted">
-                                    {house.founder ? `Founder: ${house.founder}` : 'Founder Unknown'} <br />
-                                    {house.currentLord ? `Current Lord: ${house.currentLord}` : 'No Current Lord'}
+                                    {house.founder ? `Founder: ${house.founder}` : 'Founder Unknown'}
                                 </Card.Subtitle>
-                                <Card.Text className="mt-3">
+                                <Card.Text>
                                     <strong>Region:</strong> {house.region} <br />
                                     <strong>Seats:</strong> {house.seats ? house.seats.join(", ") : 'Unknown'} <br />
                                     <strong>Founded:</strong> {house.founded ? house.founded : 'Unknown'} <br />

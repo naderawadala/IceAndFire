@@ -1,68 +1,58 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace IceAndFire.Domain.Entities
 {
     public class Character
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
-        [JsonPropertyName("id")]
-        public required string Id { get; set; }
+        [BsonElement("name")]
+        public string Name { get; set; }
 
-        [JsonPropertyName("url")]
-        public required string Url { get; set; }  
-   
-        [JsonPropertyName("name")]
-        public required string Name { get; set; }
-
-        [JsonPropertyName("gender")]
+        [BsonElement("gender")]
         public string? Gender { get; set; }
 
-        [JsonPropertyName("culture")]
+        [BsonElement("culture")]
         public string? Culture { get; set; }
 
-        [JsonPropertyName("born")]
+        [BsonElement("born")]
         public string? Born { get; set; }
 
-        [JsonPropertyName("died")]
+        [BsonElement("died")]
         public string? Died { get; set; }
 
-        [JsonPropertyName("titles")]
+        [BsonElement("titles")]
         public List<string>? Titles { get; set; }
 
-        [JsonPropertyName("aliases")]
+        [BsonElement("aliases")]
         public List<string>? Aliases { get; set; }
 
-        [JsonPropertyName("father")]
+        [BsonElement("father")]
         public string? Father { get; set; }
 
-        [JsonPropertyName("mother")]
+        [BsonElement("mother")]
         public string? Mother { get; set; }
 
-        [JsonPropertyName("spouse")]
+        [BsonElement("spouse")]
         public string? Spouse { get; set; }
 
-        [JsonPropertyName("allegiances")]
+        [BsonElement("allegiances")]
         public List<string>? Allegiances { get; set; }
 
-        [JsonPropertyName("books")]
+        [BsonElement("books")]
         public List<string>? Books { get; set; }
 
-        [JsonPropertyName("povBooks")]
+        [BsonElement("povBooks")]
         public List<string>? PovBooks { get; set; }
 
-        [JsonPropertyName("tvSeries")]
+        [BsonElement("tvSeries")]
         public List<string>? TvSeries { get; set; }
 
-        [JsonPropertyName("playedBy")]
+        [BsonElement("playedBy")]
         public List<string>? PlayedBy { get; set; }
     }
-
 }

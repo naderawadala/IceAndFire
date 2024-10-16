@@ -1,4 +1,5 @@
-﻿using IceAndFire.Application.Services;
+﻿using HotChocolate.Authorization;
+using IceAndFire.Application.Services;
 using IceAndFire.Domain.Entities;
 using IceAndFire.Infrastructure.Persistence;
 using MongoDB.Driver;

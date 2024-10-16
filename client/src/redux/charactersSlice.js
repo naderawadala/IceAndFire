@@ -1,28 +1,85 @@
+// src/redux/charactersSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const initialState = {
-    items: [],
-    character: null,
-    status: 'idle', // idle | loading | succeeded | failed
-    error: null,
-};
 
 // Fetch all characters
 export const fetchCharacters = createAsyncThunk('characters/fetchCharacters', async () => {
-    const response = await axios.get('/api/characters');
-    return response.data;
+    const response = await fetch('http://localhost:5000/graphql', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            query: `
+            query {
+              characters {
+                aliases
+                allegiances
+                books
+                born
+                culture
+                died
+                father
+                gender
+                id
+                mother
+                name
+                playedBy
+                povBooks
+                spouse
+                titles
+                tvSeries
+              }
+            }`,
+        }),
+    });
+    const data = await response.json();
+    return data.data.characters; // Return all characters
 });
 
 // Fetch character by ID
-export const fetchCharacterById = createAsyncThunk('characters/fetchCharacterById', async (id) => {
-    const response = await axios.get(`/api/characters/${id}`);
-    return response.data;
+export const fetchCharacterByName = createAsyncThunk('characters/fetchCharacterByName', async (name) => {
+    const response = await fetch('http://localhost:5000/graphql', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            query: `
+            query {
+              characterByName(name: "${name}") {
+                aliases
+                allegiances
+                books
+                born
+                culture
+                died
+                father
+                gender
+                mother
+                name
+                playedBy
+                povBooks
+                spouse
+                titles
+                tvSeries
+              }
+            }`,
+        }),
+    });
+    const data = await response.json();
+    console.log(data)
+    return data.data.characterByName; // Return the character by name
 });
 
+// Character slice setup (initial state and reducers)
 const charactersSlice = createSlice({
     name: 'characters',
-    initialState,
+    initialState: {
+        character: null,
+        items: [],
+        status: 'idle',
+        error: null,
+    },
     reducers: {},
     extraReducers: (builder) => {
         builder
@@ -31,20 +88,20 @@ const charactersSlice = createSlice({
             })
             .addCase(fetchCharacters.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.items = action.payload;
+                state.items = action.payload; // Store fetched characters
             })
             .addCase(fetchCharacters.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             })
-            .addCase(fetchCharacterById.pending, (state) => {
+            .addCase(fetchCharacterByName.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(fetchCharacterById.fulfilled, (state, action) => {
+            .addCase(fetchCharacterByName.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.character = action.payload;
+                state.character = action.payload; // Store fetched character by ID
             })
-            .addCase(fetchCharacterById.rejected, (state, action) => {
+            .addCase(fetchCharacterByName.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             });

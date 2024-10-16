@@ -34,7 +34,6 @@ const BookDetail = () => {
         navigate(`/update-book/${book.name}`, { state: book }); // Pass book data to BookForm
     };
     
-
     if (loading) {
         return <Spinner animation="border" />;
     }
@@ -49,6 +48,14 @@ const BookDetail = () => {
 
     return (
         <div className="mt-5 container" style={{ maxWidth: '800px', margin: '0 auto' }}>
+            <Button 
+                variant="outline-secondary" 
+                onClick={() => navigate('/books')} // Navigate to the book list
+                className="mb-4" 
+                style={{ padding: '0.375rem 1rem' }} // Maintain consistent padding
+            >
+                <i className="bi bi-arrow-left"></i> Go Back
+            </Button>
             <h2>{book.name}</h2>
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <div>

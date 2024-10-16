@@ -8,30 +8,38 @@ import BookDetail from './pages/BookDetail';
 import CharacterDetail from './pages/CharacterDetail';
 import HouseDetail from './pages/HouseDetail';
 import BookForm from './components/BookForm';
-import Navbar from './components/MyNavbar'; // Ensure MyNavbar is imported correctly
 import HouseForm from './components/HouseForm';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Navbar from './components/MyNavbar';
 
 const App = () => {
-    const username = "User"; // Replace with dynamic user state management
+    const token = localStorage.getItem('token');
 
     return (
         <Router>
-            <Navbar username={username} />
+            {token && <Navbar />}
             <Routes>
-                <Route path="/" element={<Main />} />
-                <Route path="/books" element={<BookList />} />
-                <Route path="/books/:name" element={<BookDetail />} />
-                <Route path="/update-book/:name" element={<BookForm />} /> 
-                <Route path="/books/new" element={<BookForm />} />
-
-                <Route path="/characters" element={<CharacterList />} />
-                <Route path="/characters/:id" element={<CharacterDetail />} />
-
-                <Route path="/houses" element={<HouseList />} />
-                <Route path="/houses/new" element={<HouseForm />} />
-                <Route path="/houses/:name" element={<HouseDetail />} />
-                <Route path="/update-house/:name" element={<HouseForm />} />
-                
+                {token ? (
+                    <>
+                        <Route path="/" element={<Main />} />
+                        <Route path="/books" element={<BookList />} />
+                        <Route path="/books/:name" element={<BookDetail />} />
+                        <Route path="/update-book/:name" element={<BookForm />} /> 
+                        <Route path="/books/new" element={<BookForm />} />
+                        <Route path="/characters" element={<CharacterList />} />
+                        <Route path="/characters/:name" element={<CharacterDetail />} />
+                        <Route path="/houses" element={<HouseList />} />
+                        <Route path="/houses/new" element={<HouseForm />} />
+                        <Route path="/houses/:name" element={<HouseDetail />} />
+                        <Route path="/update-house/:name" element={<HouseForm />} />
+                    </>
+                ) : (
+                    <>
+                        <Route path="/" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                    </>
+                )}
             </Routes>
         </Router>
     );

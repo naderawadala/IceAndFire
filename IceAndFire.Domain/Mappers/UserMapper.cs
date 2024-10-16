@@ -31,6 +31,7 @@ namespace IceAndFire.Domain.Mappers
                     Id = string.IsNullOrEmpty(Id) ? ObjectId.GenerateNewId().ToString() : Id,
                     Username = dto.Username,
                     Password = dto.Password,
+                    Role = null,
                     RefreshToken = null,
                     RefreshTokenExpiration = null
                 };

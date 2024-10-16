@@ -1,4 +1,5 @@
 ﻿using AppAny.HotChocolate.FluentValidation;
+using HotChocolate.Authorization;
 using IceAndFire.Application.Services;
 using IceAndFire.Domain.DTO;
 using IceAndFire.Domain.Entities;
@@ -20,7 +21,7 @@ namespace IceAndFire.Application.Mutations
         {
             this._service = service;
         }
-
+        
         [GraphQLDescription("Create a new House.")]
         public async Task<House> CreateHouse([UseFluentValidation, UseValidator<HouseInputValidator>] HouseDto houseDto, [Service] MongoDbContext context)
         {

@@ -48,6 +48,16 @@ const HouseDetail = () => {
 
     return (
         <div className="mt-5 container" style={{ maxWidth: '800px', margin: '0 auto' }}>
+            {/* Go Back Button */}
+            <Button 
+                variant="outline-secondary" 
+                onClick={() => navigate('/houses')} // Navigate to the house list
+                className="mb-4" 
+                style={{ padding: '0.375rem 1rem' }} // Maintain consistent padding
+            >
+                <i className="bi bi-arrow-left"></i> Go Back
+            </Button>
+            
             <h2>{house.name}</h2>
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <div>
@@ -70,7 +80,7 @@ const HouseDetail = () => {
                 <Accordion.Item eventKey="0">
                     <Accordion.Header>Titles</Accordion.Header>
                     <Accordion.Body>
-                        {house.titles && house.titles.length > 0 ? ( // Check if titles exists
+                        {house.titles && house.titles.length > 0 ? (
                             <ul>
                                 {house.titles.map((title, index) => (
                                     <li key={index}>{title}</li>
@@ -84,7 +94,7 @@ const HouseDetail = () => {
                 <Accordion.Item eventKey="1">
                     <Accordion.Header>Seats</Accordion.Header>
                     <Accordion.Body>
-                        {house.seats && house.seats.length > 0 ? ( // Check if seats exists
+                        {house.seats && house.seats.length > 0 ? (
                             <ul>
                                 {house.seats.map((seat, index) => (
                                     <li key={index}>{seat}</li>
@@ -98,7 +108,7 @@ const HouseDetail = () => {
                 <Accordion.Item eventKey="2">
                     <Accordion.Header>Ancestral Weapons</Accordion.Header>
                     <Accordion.Body>
-                        {house.ancestralWeapons && house.ancestralWeapons.length > 0 ? ( // Check if ancestralWeapons exists
+                        {house.ancestralWeapons && house.ancestralWeapons.length > 0 ? (
                             <ul>
                                 {house.ancestralWeapons.map((weapon, index) => (
                                     <li key={index}>{weapon}</li>
@@ -112,7 +122,7 @@ const HouseDetail = () => {
                 <Accordion.Item eventKey="3">
                     <Accordion.Header>Cadet Branches</Accordion.Header>
                     <Accordion.Body>
-                        {house.cadetBranches && house.cadetBranches.length > 0 ? ( // Check if cadetBranches exists
+                        {house.cadetBranches && house.cadetBranches.length > 0 ? (
                             <ul>
                                 {house.cadetBranches.map((branch, index) => (
                                     <li key={index}>{branch}</li>
@@ -126,7 +136,7 @@ const HouseDetail = () => {
                 <Accordion.Item eventKey="4">
                     <Accordion.Header>Sworn Members</Accordion.Header>
                     <Accordion.Body>
-                        {house.swornMembers && house.swornMembers.length > 0 ? ( // Check if swornMembers exists
+                        {house.swornMembers && house.swornMembers.length > 0 ? (
                             <ul>
                                 {house.swornMembers.map((member, index) => (
                                     <li key={index}>{member}</li>
