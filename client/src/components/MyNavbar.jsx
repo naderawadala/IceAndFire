@@ -15,7 +15,7 @@ const MyNavbar = ({ username }) => {
         if (confirmLogout) {
             dispatch(logoutUser()); // Dispatch the logoutUser thunk
             console.log("User logged out");
-            window.location.reload();
+            //window.location.reload();
         }
     };
 

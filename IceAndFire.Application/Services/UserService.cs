@@ -87,7 +87,8 @@ namespace IceAndFire.Application.Services
             return new LoginResponseDto
             {
                 Token = token,
-                Role = user.Role
+                Role = user.Role,
+                RefreshToken = user.RefreshToken
             };
         }
 

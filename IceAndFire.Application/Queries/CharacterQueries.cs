@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using IceAndFire.Application.Services;
+using HotChocolate.Authorization;
 
 namespace IceAndFire.Application.Queries
 {
@@ -22,7 +23,6 @@ namespace IceAndFire.Application.Queries
         {
             return await _service.GetCharactersAsync();
         }
-
         [GraphQLDescription("Get a character by Name.")]
         public async Task<Character> GetCharacterByName(string name, [Service] MongoDbContext context)
         {
