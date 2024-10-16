@@ -23,21 +23,21 @@ namespace IceAndFire.Application.Mutations
         }
         
         [GraphQLDescription("Create a new House.")]
-        public async Task<House> CreateHouse([UseFluentValidation, UseValidator<HouseInputValidator>] HouseDto houseDto, [Service] MongoDbContext context)
+        public async Task<House> CreateHouse([UseFluentValidation, UseValidator<HouseInputValidator>] HouseDto houseDto)
         {
             House createdHouseDto = await this._service.CreateHouseAsync(houseDto);
             return createdHouseDto;
         }
 
         [GraphQLDescription("Update an existing house.")]
-        public async Task<House> UpdateHouse(string name, [UseFluentValidation, UseValidator<HouseInputValidator>] HouseDto houseDto, [Service] MongoDbContext context)
+        public async Task<House> UpdateHouse(string name, [UseFluentValidation, UseValidator<HouseInputValidator>] HouseDto houseDto)
         {
             House updatedHouseDto = await this._service.UpdateHouseAsync(name, houseDto);
             return updatedHouseDto;
         }
 
         [GraphQLDescription("Delete a house by name.")]
-        public async Task<bool> DeleteHouse(string name, [Service] MongoDbContext context)
+        public async Task<bool> DeleteHouse(string name)
         {
             bool isDeleted = await this._service.DeleteHouseAsync(name);
             return isDeleted;

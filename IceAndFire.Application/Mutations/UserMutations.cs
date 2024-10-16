@@ -27,9 +27,8 @@ namespace IceAndFire.Application.Mutations
             this._service = service;
         }
         [GraphQLDescription("Register a new user.")]
-        public async Task<User> Register(UserDto userDto, [Service] MongoDbContext context)
+        public async Task<User> Register([UseFluentValidation, UseValidator<UserInputValidator>] UserDto userDto)
         {
-            Console.WriteLine("TEST DOES IT EVEN REACH?");
             User registeredUserDto = await this._service.RegisterUserAsync(userDto);
             return registeredUserDto;
         }

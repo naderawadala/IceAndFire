@@ -25,23 +25,22 @@ namespace IceAndFire.Application.Mutations
             this._service = service;
         }
         [GraphQLDescription("Create a new book.")]
-        public async Task<Book> CreateBook([UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto, [Service] MongoDbContext context)
+        public async Task<Book> CreateBook([UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto)
         {
             Book createdBookDto = await this._service.CreateBookAsync(bookDto);
             return createdBookDto;
         }
 
         [GraphQLDescription("Update an existing book.")]
-        public async Task<Book> UpdateBook(string isbn, [UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto, [Service] MongoDbContext context)
+        public async Task<Book> UpdateBook(string isbn, [UseFluentValidation, UseValidator<BookInputValidator>] BookDto bookDto)
         {
             Book updatedBookDto = await this._service.UpdateBookAsync(isbn, bookDto);
             return updatedBookDto;
         }
 
         [GraphQLDescription("Delete a book by ISBN.")]
-        public async Task<bool> DeleteBook(string isbn, [Service] MongoDbContext context)
+        public async Task<bool> DeleteBook(string isbn)
         {
-            Console.WriteLine("does this even enter");
             bool isDeleted = await this._service.DeleteBookAsync(isbn);
             return isDeleted;
         }

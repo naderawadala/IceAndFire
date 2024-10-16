@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IceAndFire.Domain.DTO
 {
-    public class LoginResponseDto
+    public record LoginResponseDto
     {
         public string Token { get; set; }
         public string Role { get; set; }
