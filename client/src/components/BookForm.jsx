@@ -6,6 +6,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { fetchBookByName, createBook, updateBook, clearBook, fetchBooks } from '../redux/booksSlice/booksSlice';
 import bookValidationSchema from '../validation/bookValidationSchema';
+import { toast } from 'react-toastify';
 
 const BookForm = () => {
     const { name } = useParams();
@@ -81,21 +82,25 @@ const BookForm = () => {
             released: new Date(values.released).toISOString(),
         };
 
-        if (isEditMode) {
-            await dispatch(updateBook({ isbn: book.isbn, bookData: payload }));
-        } else {
-            await dispatch(createBook(payload));
-        }
-
-        if (!error) {
+        try {
+            if (isEditMode) {
+                await dispatch(updateBook({ isbn: book.isbn, bookData: payload })).unwrap();
+                toast.success('Book updated successfully!'); 
+            } else {
+                await dispatch(createBook(payload)).unwrap();
+                toast.success('Book created successfully!'); 
+            }
             dispatch(fetchBooks());
             resetForm();
             dispatch(clearBook());
             navigate('/books');
+        } catch (error) {
+            toast.error('An error occurred! Please try again.'); 
+            console.error("Error:", error); 
         }
+
         setSubmitting(false);
     };
-
 
     const handleGoBack = () => {
         dispatch(clearBook()); 

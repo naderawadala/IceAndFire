@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginUser } from '../redux/authSlice/authSlice';
 import { Button, Form } from 'react-bootstrap';
+import { toast } from 'react-toastify'; // Import toast
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -15,7 +16,11 @@ const Login = () => {
         try {
             const token = await dispatch(loginUser({ username, password })).unwrap();
             localStorage.setItem('token', token.token);
+            toast.success('Login successful!'); // Show success toast
+            window.location.href = '/'; 
         } catch (error) {
+            toast.error('Login failed! Please check your credentials.'); // Show error toast
+            console.error("Login failed:", error); // Log the error to the console
         }
     };
 

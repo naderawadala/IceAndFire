@@ -31,7 +31,7 @@ describe('charactersSlice', () => {
                 status: 'idle',
                 error: null,
                 currentPage: 1,
-                charactersPerPage: 10,
+                charactersPerPage: 9,
             };
             expect(store.getState().characters).toEqual(initialState);
         });

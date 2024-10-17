@@ -76,7 +76,7 @@ const charactersSlice = createSlice({
         status: 'idle',
         error: null,
         currentPage: 1,
-        charactersPerPage: 10,
+        charactersPerPage: 9,
     },
     reducers: {
         setCurrentPage(state, action) {

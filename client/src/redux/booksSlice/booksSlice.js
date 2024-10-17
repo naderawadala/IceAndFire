@@ -196,7 +196,7 @@ const booksSlice = createSlice({
         error: null,
         book: null,
         currentPage: 1,     
-        booksPerPage: 6,   
+        booksPerPage: 4,   
     },
     reducers: {
         clearBook(state) {

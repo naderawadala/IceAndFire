@@ -13,7 +13,8 @@ const MyNavbar = ({ username }) => {
     const handleLogout = () => {
         const confirmLogout = window.confirm("Are you sure you want to logout?");
         if (confirmLogout) {
-            dispatch(logoutUser()); 
+            dispatch(logoutUser());
+            window.location.href = '/'; 
         }
     };
 

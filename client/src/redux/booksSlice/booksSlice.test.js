@@ -31,7 +31,7 @@ describe('booksSlice', () => {
             error: null,
             book: null,
             currentPage: 1,
-            booksPerPage: 6,
+            booksPerPage: 4,
         };
         expect(store.getState().books).toEqual(initialState);
     });

@@ -51,8 +51,5 @@ The frontend accesses graphql for data retrieval at http://localhost:5000/graphq
 // TODO
 ## Remaining tasks
 
-- Add Integration and Unit Tests for BE and FE
-- Implement frontend
-- Implement JWT Authentication and Authorization
-- Major codebase refactoring in BE
-- Validation and error page handling
+- Add more unit tests to the back end and front end
+- Fix JWT Auth token generation

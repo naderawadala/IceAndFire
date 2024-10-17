@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../redux/authSlice/authSlice';
 import { useDispatch } from 'react-redux';
 import { Button, Form } from 'react-bootstrap';
+import { toast } from 'react-toastify'; // Import toast
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -14,8 +15,10 @@ const Register = () => {
         e.preventDefault();
         try {
             await dispatch(registerUser({ username, password })).unwrap();
-            navigate('/');
+            toast.success('Registration successful!'); // Show success toast
+            navigate('/login');
         } catch (error) {
+            toast.error('Registration failed! Please try again.'); // Show error toast
         }
     };
 
