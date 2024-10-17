@@ -36,29 +36,23 @@ namespace IceAndFire.Application.Services
             const string cacheKey = "characters";
 
             var cachedData = _redisCache.Get(cacheKey);
-            Console.WriteLine("PRE CACHE");
             if (cachedData != null)
             {
-                Console.WriteLine("IN CACHE");
                 return JsonSerializer.Deserialize<IEnumerable<Character>>(cachedData);
             }
-            Console.WriteLine("post CACHE");
 
             List<Character> charactersFromDb;
             try
             {
                 charactersFromDb = await _context.Characters.Find(_ => true).ToListAsync();
-                Console.WriteLine($"MongoDB retrieval success. Characters found: {charactersFromDb.Count}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching characters from MongoDB: " + ex.Message);
-                throw;
+                throw ex.Message;
             }
 
             if (charactersFromDb != null && charactersFromDb.Count > 0)
             {
-                Console.WriteLine("Characters successfully fetched from MongoDB.");
                 //_redisCache.Set(cacheKey, JsonSerializer.Serialize(charactersFromDb), TimeSpan.FromMinutes(10));
                 return charactersFromDb;
             }
@@ -110,14 +104,12 @@ namespace IceAndFire.Application.Services
             var cachedData = _redisCache.Get(name);
             if (cachedData != null)
             {
-                Console.WriteLine("Character found in cache.");
                 return JsonSerializer.Deserialize<Character>(cachedData);
             }
 
             var characterFromDb = await _context.Characters.Find(c => c.Name == name).FirstOrDefaultAsync();
             if (characterFromDb != null)
             {
-                Console.WriteLine("Character found in MongoDB.");
                // var characterDto = CharacterMapper.MapToDto(characterFromDb);
                 _redisCache.Set(name, JsonSerializer.Serialize(characterFromDb), TimeSpan.FromMinutes(10));
                 return characterFromDb;

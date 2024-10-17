@@ -43,7 +43,6 @@ namespace IceAndFire.Application.Services
             var housesFromDb = await _context.Houses.Find(_ => true).ToListAsync();
             if (housesFromDb.Count > 0)
             {
-                Console.WriteLine("Houses found in MongoDB.");
                 _redisCache.Set(cacheKey, JsonSerializer.Serialize(housesFromDb), TimeSpan.FromMinutes(10));
                 return housesFromDb;
             }
@@ -64,7 +63,6 @@ namespace IceAndFire.Application.Services
             var houseFromDb = await _context.Houses.Find(h => h.Name.Equals(name)).FirstOrDefaultAsync();
             if (houseFromDb != null)
             {
-                Console.WriteLine("House found in MongoDB.");
                 //var houseDto = HouseMapper.MapToDto(houseFromDb);
                 _redisCache.Set(name, JsonSerializer.Serialize(houseFromDb), TimeSpan.FromMinutes(10));
                 return houseFromDb;
@@ -73,7 +71,6 @@ namespace IceAndFire.Application.Services
             var houseFromApi = await FetchHouseFromApiAsync(name);
             if (houseFromApi != null)
             {
-                Console.WriteLine("House fetched from API.");
                 //var mappedHouse = HouseMapper.MapToEntity(houseFromApi);
                 await _context.Houses.InsertOneAsync(houseFromApi);
                 _redisCache.Set(name, JsonSerializer.Serialize(houseFromApi), TimeSpan.FromMinutes(10));

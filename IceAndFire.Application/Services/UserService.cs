@@ -32,7 +32,6 @@ namespace IceAndFire.Application.Services
 
         public async Task<User> RegisterUserAsync(UserDto userDto)
         {
-            Console.WriteLine("Reach first?");
 
             var existingUser = await _context.Users
                 .Find(u => u.Username == userDto.Username)
@@ -43,7 +42,6 @@ namespace IceAndFire.Application.Services
                 throw new Exception("Username already exists.");
             }
 
-            Console.WriteLine("Reach here");
 
             userDto.Password = _passwordHasher.HashPassword(userDto.Password);
             var user = UserMapper.MapToEntity(userDto);
@@ -58,7 +56,6 @@ namespace IceAndFire.Application.Services
                 user.Role = "User"; 
             }
 
-            Console.WriteLine("Reached here");
 
             await _context.Users.InsertOneAsync(user);
 
@@ -95,7 +92,6 @@ namespace IceAndFire.Application.Services
 
         public string GenerateToken(User user)
         {
-            Console.WriteLine("back to gen token");
             var claims = new[]
             {
             new Claim("subject", user.Username),
@@ -107,7 +103,6 @@ namespace IceAndFire.Application.Services
             //byte[] keyBytes = Convert.FromBase64String(_config["Jwt:Key"]);
            // var key = new SymmetricSecurityKey(keyBytes);
             var key = new SymmetricSecurityKey(ConvertHexStringToByteArray(_config["Jwt:Key"]));
-            Console.WriteLine($"Key Length: {key.KeySize} bits");
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
 
