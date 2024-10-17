@@ -404,5 +404,5 @@ mutation {
 ## Remaining tasks
 
 - Add more unit tests to the back end and front end
-- Fix JWT Auth token generation
+- Fix JWT Auth token generation (currently the Bearer being signed is invalid, most likely due to the signing algorithm messing something up)
 - Make improvements to UX in FE
